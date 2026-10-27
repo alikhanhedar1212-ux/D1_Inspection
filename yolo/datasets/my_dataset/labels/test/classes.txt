@@ -1,0 +1,5 @@
+turn_left
+turn_right
+turn_round
+go_straight
+extinguisher

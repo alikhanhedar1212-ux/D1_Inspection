@@ -1,0 +1,8 @@
+# Python 依赖（环境：conda go2_yolo，Python 3.10）
+# CUDA 12.1 版本的 torch/torchvision 需走 PyTorch 官方源安装：
+#   pip install torch==2.5.1 torchvision==0.20.1 --index-url https://download.pytorch.org/whl/cu121
+torch==2.5.1
+torchvision==0.20.1
+ultralytics==8.4.176
+opencv-python==5.0.0.93
+numpy==2.2.6

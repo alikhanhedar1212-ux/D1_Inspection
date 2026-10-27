@@ -1,0 +1,11 @@
+path: /home/ubuntu20/d1_ws/yolo/yolo/datasets/my_dataset
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: turn_left
+  1: turn_right
+  2: turn_round
+  3: go_straight
+  4: extinguisher
