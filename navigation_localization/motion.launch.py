@@ -1,7 +1,7 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from deployment import motion_parameters
+from deployment import motion_parameters, config_path
 import os
 from launch.actions import SetEnvironmentVariable
 from launch import LaunchDescription
@@ -13,8 +13,8 @@ def generate_launch_description():
  return LaunchDescription([
   SetEnvironmentVariable("AMENT_PREFIX_PATH",str(vendor)+":"+os.environ.get("AMENT_PREFIX_PATH","")),
   SetEnvironmentVariable("LD_LIBRARY_PATH",str(r/"terminal_replan/build")+":"+str(vendor/"lib")+":"+str(vendor/"opt/openvdb_vendor/lib")+":"+os.environ.get("LD_LIBRARY_PATH","")),
-  Node(package='nav2_planner',executable='planner_server',name='planner_server',parameters=[str(r/'planner.yaml')],output='screen'),
+  Node(package='nav2_planner',executable='planner_server',name='planner_server',parameters=[str(config_path('planner.yaml'))],output='screen'),
   Node(package='nav2_controller',executable='controller_server',name='controller_server',parameters=[motion_parameters('controller_server')],remappings=[('cmd_vel','/nav_cmd_vel')],output='screen'),
-  Node(package='nav2_behaviors',executable='behavior_server',name='behavior_server',parameters=[str(r/'patrol_behaviors.yaml')],remappings=[('cmd_vel','/nav_cmd_vel')],output='screen'),
+  Node(package='nav2_behaviors',executable='behavior_server',name='behavior_server',parameters=[str(config_path('patrol_behaviors.yaml'))],remappings=[('cmd_vel','/nav_cmd_vel')],output='screen'),
   Node(package='nav2_bt_navigator',executable='bt_navigator',name='bt_navigator',parameters=[motion_parameters()],output='screen'),
   Node(package='nav2_lifecycle_manager',executable='lifecycle_manager',name='lifecycle_manager_navigation',parameters=[{'autostart':True,'node_names':['planner_server','controller_server','behavior_server','bt_navigator']}],output='screen')])

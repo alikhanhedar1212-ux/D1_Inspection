@@ -11,10 +11,25 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import deployment
 
 
 class DeploymentTests(unittest.TestCase):
+    def test_module_resources_are_in_their_owned_directories(self):
+        resources = [deployment.config_path('config.example.json'),
+                     deployment.config_path('motion.yaml'),
+                     deployment.map_path('map.yaml'),
+                     deployment.map_path('map.pgm'),
+                     deployment.map_path('waypoints.yaml'),
+                     deployment.map_path('patrol_config.json'),
+                     deployment.ui_path('dashboard.html'),
+                     deployment.ui_path('rviz/navigation_drive.rviz'),
+                     deployment.behavior_path('navigate_arrival_v2.xml')]
+        for path in resources:
+            with self.subTest(path=path):
+                self.assertTrue(path.is_file())
+
     def test_remote_home_and_special_characters_are_expanded_safely(self):
         with tempfile.TemporaryDirectory() as directory:
             clone = Path(directory)/'clone with spaces; dollar$'
@@ -30,17 +45,17 @@ class DeploymentTests(unittest.TestCase):
             self.assertFalse((Path(directory)/'SHOULD_NOT_EXIST').exists())
 
     def test_existing_device_layout_can_be_configured(self):
-        with patch.dict(deployment.SETTINGS, {'firefly_navigation_localization_dir': '~/existing control'}):
-            self.assertEqual(deployment.remote_file('firefly','navigation_localization','velocity_receiver.py'), '~/existing control/velocity_receiver.py')
+        with patch.dict(deployment.SETTINGS, {'firefly_drivers_dir': '~/existing control'}):
+            self.assertEqual(deployment.remote_file('firefly','drivers','velocity_receiver.py'), '~/existing control/velocity_receiver.py')
 
     def test_motion_trees_follow_a_relocated_clone(self):
         with tempfile.TemporaryDirectory() as directory:
             clone = Path(directory)/'different project name with spaces'
-            (clone/'navigation_localization').mkdir(parents=True)
-            shutil.copy2(deployment.ROOT/'navigation_localization/motion.yaml',clone/'navigation_localization/motion.yaml')
+            (clone/'drivers/config').mkdir(parents=True)
+            shutil.copy2(deployment.config_path('motion.yaml'),clone/'drivers/config/motion.yaml')
             with patch.object(deployment, 'ROOT', clone):
                 params = deployment.motion_parameters()
-                self.assertEqual(params['default_nav_to_pose_bt_xml'], str(clone/'navigation_localization/navigate_arrival_v2.xml'))
+                self.assertEqual(params['default_nav_to_pose_bt_xml'], str(clone/'navigation_localization/behavior_trees/navigate_arrival_v2.xml'))
                 self.assertIn('FollowPath', deployment.motion_parameters('controller_server'))
                 self.assertNotIn('bt_navigator', params)
 
@@ -49,13 +64,14 @@ class DeploymentTests(unittest.TestCase):
             clone = Path(directory)/'renamed clone with spaces'
             nav = clone/'navigation_localization'
             nav.mkdir(parents=True)
-            for name in ('runtime_env.sh', 'cyclonedds.xml'):
-                shutil.copy2(deployment.ROOT/'navigation_localization'/name,nav/name)
+            (clone/'drivers/config').mkdir(parents=True)
+            shutil.copy2(deployment.ROOT/'navigation_localization/runtime_env.sh',nav/'runtime_env.sh')
+            shutil.copy2(deployment.config_path('cyclonedds.xml'),clone/'drivers/config/cyclonedds.xml')
             setup = Path(directory)/'ROS setup.bash'
             setup.write_text('export FAKE_ROS_READY=yes\n')
             command = f'source {shlex.quote(str(nav/"runtime_env.sh"))} && printf "%s\\n" "$FAKE_ROS_READY" "$CYCLONEDDS_URI"'
             result = subprocess.run(['bash','-c',command],env=dict(os.environ,D1_ROS_SETUP=str(setup)),cwd='/',capture_output=True,text=True,check=True)
-            self.assertEqual(result.stdout.splitlines(), ['yes', f'file://{nav}/cyclonedds.xml'])
+            self.assertEqual(result.stdout.splitlines(), ['yes', f'file://{clone}/drivers/config/cyclonedds.xml'])
 
     def test_config_file_overrides_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

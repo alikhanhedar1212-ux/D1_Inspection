@@ -1,5 +1,5 @@
 """Receive source-timestamped latest camera frames; shared by RViz and OctoMap."""
-from deployment import remote_file, ssh_command
+from project_config import remote_file, ssh_command
 import subprocess,cv2,numpy as np,time,rclpy,json,threading
 from pathlib import Path
 from cv_bridge import CvBridge
@@ -11,12 +11,12 @@ from navigation_localization.clock_sync import RemoteClock,ClockSync
 rclpy.init();node=rclpy.create_node('dog_camera_local');pub=node.create_publisher(Image,'/dog_camera/image_raw',1);bridge=CvBridge()
 clock=RemoteClock();clock_sync=ClockSync(clock)
 latest=LatestFrame();closed=threading.Event();p=None
-status_file=Path(__file__).parent/'navigation_localization/camera_status.json';status={'connection':'connecting','frames':0};last=0.
+status_file=Path(__file__).resolve().parent.parent/'navigation_localization/camera_status.json';status={'connection':'connecting','frames':0};last=0.
 def receiver():
     global p
     while not closed.is_set():
         try:
-            p=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', '', 'camera_sender_latest.py')], timeout=5),stdout=subprocess.PIPE)
+            p=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'drivers', 'camera_sender_latest.py')], timeout=5),stdout=subprocess.PIPE)
             remote_clock=read_hello(p.stdout);mono=time.monotonic();clock.prime(remote_clock,mono);status.update(connection='streaming',clock_translation_s=time.time()-remote_clock)
             while not closed.is_set():
                 captured,sent,sequence,payload=read_frame(p.stdout)

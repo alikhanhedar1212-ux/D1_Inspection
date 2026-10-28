@@ -1,3 +1,4 @@
+from project_config import map_path
 import math
 import json
 import time
@@ -52,7 +53,7 @@ class FlowTests(unittest.TestCase):
 
     def mission(self, labels):
         p=PatrolRuntime.__new__(PatrolRuntime)
-        p.config=json.loads((Path(__file__).parent/'patrol_config.json').read_text())
+        p.config=json.loads((map_path('patrol_config.json')).read_text())
         p.config['mode']='inspection';p.config['order']=[2,1,3,4]
         p.config.pop('stop_overrides',None)
         p.cancelled=threading.Event();p.fault=None;p.active=True;p.goal=None
@@ -164,7 +165,7 @@ class FlowTests(unittest.TestCase):
         p=self.mission([]);p.config.update(mode='navigation_test',order=[1,2,3,4],stop_overrides={'2':{'waypoint_id':2}})
         original=dict(p.config['points']['2']);p._dwell=lambda ident:None
         p._run({'x':0,'y':0,'yaw':0})
-        washroom=next(w for w in yaml.safe_load((patrol_runtime.NAV/'waypoints.yaml').read_text())['waypoints'] if w['id']==2)
+        washroom=next(w for w in yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints'] if w['id']==2)
         self.assertTrue(all(p.visited[1][k]==value for k,value in washroom.items()))
         self.assertEqual(p.config['points']['2'],original)
         self.assertEqual(len(p.visited),5)

@@ -25,7 +25,7 @@ class VoiceBatteryQuery(VoiceRelocalizer):
             self.report(event='battery_query_started')
             try:
                 started = time.monotonic()
-                command = ssh_command('firefly', [remote_file('firefly', 'voice_navigation', 'read_battery_native')], timeout=5)
+                command = ssh_command('firefly', [remote_file('firefly', 'drivers', 'read_battery_native')], timeout=5)
                 code, stdout, stderr = self._run_command(command, 12, cancelled)
                 if code:
                     raise RuntimeError(stderr.strip() or '未收到实时电池数据')

@@ -1,4 +1,5 @@
 """Voice mission adapter. Actual 3D services must be commissioned separately."""
+from project_config import behavior_path, config_path
 import json
 import math
 import queue
@@ -21,7 +22,7 @@ class StairsRuntime:
         from std_srvs.srv import Trigger
         self.nav = navigator
         self.report = report
-        config = json.loads((ROOT / 'stairs_task_config.json').read_text())
+        config = json.loads((config_path('stairs_task_config.json')).read_text())
         self.handoff_only = config.get('handoff_only', False)
         self.wait_only = config.get('first_door_wait_only', False)
         self.machine = StairsTask(stop_at_first_confirmation=self.handoff_only,
@@ -102,7 +103,7 @@ class StairsRuntime:
             raise RuntimeError(result.message or '任务服务拒绝执行')
 
     def _preflight(self, effect):
-        self.config = json.loads((ROOT / 'stairs_task_config.json').read_text())
+        self.config = json.loads((config_path('stairs_task_config.json')).read_text())
         if getattr(self, 'wait_only', False):
             if self.nav.busy or self.nav.posture_busy:
                 raise RuntimeError('已有导航或姿态任务')
@@ -187,7 +188,7 @@ class StairsRuntime:
             client = self.client_3d
         goal = self.nav.action_type.Goal()
         if effect.kind == 'navigate_2d':
-            goal.behavior_tree = str(ROOT.parent / 'navigation_localization/navigate_arrival_v2.xml')
+            goal.behavior_tree = str(behavior_path('navigate_arrival_v2.xml'))
         goal.pose.header.frame_id = frame
         goal.pose.header.stamp = self.nav.node.get_clock().now().to_msg()
         goal.pose.pose.position.x = float(target['x'])

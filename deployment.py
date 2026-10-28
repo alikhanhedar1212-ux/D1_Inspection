@@ -17,12 +17,13 @@ DEFAULTS = {
     'firefly_domain': 24,
     'microphone': 'alsa_input.usb-Newmine_Newmine_20180508-00.analog-stereo',
     'speaker': 'alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo',
-    'mapping_config': 'navigation_localization/lio.template.yaml',
+    'camera_device': '/dev/video2',
+    'mapping_config': 'drivers/config/lio.template.yaml',
 }
 
 
 def load_settings():
-    path = Path(os.environ.get('D1_CONFIG', ROOT / 'config.local.json')).expanduser()
+    path = Path(os.environ.get('D1_CONFIG', ROOT / 'drivers/config/config.local.json')).expanduser()
     settings = dict(DEFAULTS)
     if path.is_file():
         overrides = json.loads(path.read_text())
@@ -37,6 +38,22 @@ SETTINGS = load_settings()
 
 def setting(name):
     return SETTINGS[name]
+
+
+def config_path(name):
+    return ROOT / 'drivers' / 'config' / name
+
+
+def map_path(name):
+    return ROOT / 'maps' / name
+
+
+def ui_path(name):
+    return ROOT / 'ui' / name
+
+
+def behavior_path(name):
+    return ROOT / 'navigation_localization' / 'behavior_trees' / name
 
 
 def local_path(value):
@@ -84,12 +101,11 @@ def ssh_command(role, args, *, ros=False, timeout=8):
 def motion_parameters(node='bt_navigator'):
     """Resolve Nav2 behavior trees against this clone, regardless of cwd."""
     import yaml
-    nav = ROOT / 'navigation_localization'
-    config = yaml.safe_load((nav / 'motion.yaml').read_text())
+    config = yaml.safe_load(config_path('motion.yaml').read_text())
     parameters = config['bt_navigator']['ros__parameters']
     for name in ('default_nav_to_pose_bt_xml', 'default_nav_through_poses_bt_xml'):
         path = Path(parameters[name])
-        parameters[name] = str(path if path.is_absolute() else nav / path)
+        parameters[name] = str(path if path.is_absolute() else behavior_path(path))
     return config[node]['ros__parameters']
 
 

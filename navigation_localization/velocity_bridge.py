@@ -1,3 +1,4 @@
+from project_config import config_path, map_path
 from project_config import remote_file, ssh_command
 import time,json,subprocess,math,threading
 from pathlib import Path
@@ -18,8 +19,8 @@ from tf2_ros import Buffer,TransformListener
 class Bridge(Node):
  def __init__(self):
   super().__init__('rviz_navigation_velocity_bridge');self.command=Twist();self.cmd_time=self.scan_time=0.;self.scan=None;self.confident=False;self.stop=True;self.current_goal=None;self.goal_sources={};self.covariance=None;self.active=False;self.buf=Buffer();self.listener=TransformListener(self.buf,self);self.root=Path(__file__).parent
-  control=yaml.safe_load((self.root/'motion.yaml').read_text())['controller_server']['ros__parameters'];limits=control['FollowPath'];self.max_forward=float(limits['max_vel_x'])
-  cfg=yaml.safe_load((self.root/'map.yaml').read_text());self.origin=cfg['origin'];self.res=cfg['resolution'];self.map=np.flipud(np.array(Image.open(self.root/cfg['image'])));self.dist=distance_transform_edt(self.map>60)*self.res
+  control=yaml.safe_load((config_path('motion.yaml')).read_text())['controller_server']['ros__parameters'];limits=control['FollowPath'];self.max_forward=float(limits['max_vel_x'])
+  cfg=yaml.safe_load((map_path('map.yaml')).read_text());self.origin=cfg['origin'];self.res=cfg['resolution'];self.map=np.flipud(np.array(Image.open(map_path(cfg['image']))));self.dist=distance_transform_edt(self.map>60)*self.res
   self.goal_not_before=self.get_clock().now().nanoseconds;self.proc=None;self.transport_lost=False;self.next_connect=0.;self.stop_reason='用户停止';self.terminal_guard=TerminalRotationGuard(position_tolerance=float(control['general_goal_checker']['xy_goal_tolerance']),yaw_tolerance=float(control['general_goal_checker']['yaw_goal_tolerance']));self.connect()
   self.create_subscription(Twist,'/nav_cmd_vel',self.cmd,10);self.create_subscription(LaserScan,'/scan',self.scans,5);self.create_subscription(PoseWithCovarianceStamped,'/amcl_pose',self.pose,10);self.create_subscription(GoalStatusArray,'/navigate_to_pose/_action/status',lambda m:self.goals(m,'navigate'),10);self.create_subscription(GoalStatusArray,'/spin/_action/status',lambda m:self.goals(m,'spin'),10);self.create_service(Trigger,'/stop_navigation',self.halt);self.cancel=self.create_client(CancelGoal,'/navigate_to_pose/_action/cancel_goal');self.spin_cancel=self.create_client(CancelGoal,'/spin/_action/cancel_goal');self.create_timer(.05,self.tick);self.body_time=0.;self.stationary_since=None;self.refresh_future=None;self.create_subscription(Odometry,'/body_odom',self.body_motion,10);self.lastreport=0.;self.refresh=self.create_client(Empty,'/request_nomotion_update');self.create_timer(1.,self.refresh_pose)
  def body_motion(self,m):
@@ -39,7 +40,7 @@ class Bridge(Node):
   if stationary and not self.confident and not pending and self.refresh.service_is_ready():
    self.refresh_future=self.refresh.call_async(Empty.Request())
  def connect(self):
-  self.proc=subprocess.Popen(ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'navigation_localization', 'velocity_receiver.py')], ros=True),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
+  self.proc=subprocess.Popen(ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'drivers', 'velocity_receiver.py')], ros=True),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
   self.transport_lost=False
   threading.Thread(target=self.feedback,args=(self.proc,),daemon=True).start()
  def feedback(self,proc):

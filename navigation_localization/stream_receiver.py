@@ -9,7 +9,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import TransformStamped
 from tf2_msgs.msg import TFMessage
 from builtin_interfaces.msg import Time
-from stream_protocol import LatestFrames,read_hello,read_packet
+from drivers.stream_protocol import LatestFrames,read_hello,read_packet
 from clock_sync import RemoteClock,ClockSync
 
 rclpy.init();n=rclpy.create_node('navigation_live_bridge')
@@ -25,7 +25,7 @@ def receive():
     global proc
     while not closed.is_set():
         try:
-            proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'navigation_localization', 'stream_sender.py')], ros=True, timeout=10),stdout=subprocess.PIPE)
+            proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'drivers', 'stream_sender.py')], ros=True, timeout=10),stdout=subprocess.PIPE)
             remote_clock=read_hello(proc.stdout)
             # Bootstrap from sender wall time; independent pings recalibrate every 10s.
             local_clock=time.time();local_mono=time.monotonic();clock.prime(remote_clock,local_mono)

@@ -1,3 +1,4 @@
+from project_config import map_path
 """Restore only the washroom from the saved ray-traced projection of the original 3D scans.
 
 The source was reconstructed using leveled/dewarped 3D lidar returns 0.2--1.4 m
@@ -18,7 +19,7 @@ BOUNDS = {'x': [-20.2, -16.2], 'y': [-4.6, 3.3]}
 
 
 def prepare():
-    config = yaml.safe_load((ROOT/'map.yaml').read_text())
+    config = yaml.safe_load((map_path('map.yaml')).read_text())
     original = yaml.safe_load((SOURCE/'map.yaml').read_text())
     for key in ('resolution', 'origin', 'negate', 'occupied_thresh'):
         assert config[key] == original[key], '原始投影和当前栅格坐标不一致：'+key
@@ -33,7 +34,7 @@ def prepare():
     outputs = {}
     records = {}
     for name in ('map.pgm', 'map_cleaned.pgm'):
-        old = np.flipud(np.array(Image.open(ROOT/name)))
+        old = np.flipud(np.array(Image.open(map_path(name))))
         assert old.shape == source.shape
         updated = old.copy(); updated[mask] = source[mask]
         assert np.array_equal(updated[~mask], old[~mask])
@@ -45,9 +46,9 @@ def prepare():
             'hand_filled_free_reverted_to_unknown':int(np.count_nonzero(mask & (old==254) & (updated==205))),
             'outside_changed_cells':int(np.count_nonzero((updated!=old) & ~mask))}
     backup = ROOT/'backups'/('washroom_observed_'+time.strftime('%Y%m%d_%H%M%S'))
-    backup.mkdir()
+    backup.mkdir(parents=True)
     for name in outputs:
-        shutil.copy2(ROOT/name,backup/name)
+        shutil.copy2(map_path(name),backup/name)
         Image.fromarray(np.flipud(outputs[name])).save(backup/(name+'.candidate.pgm'),format='PPM')
     report={'source':str(SOURCE/original['image']), 'source_3d_scan_session':'floor_20261009_100455',
             'source_processing': 'gravity leveling, motion compensation, 0.2–1.4m above ground, SLAM ray tracing',

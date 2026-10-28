@@ -1,3 +1,4 @@
+from project_config import config_path
 import json
 from pathlib import Path
 import unittest
@@ -181,7 +182,7 @@ class MissionTests(unittest.TestCase):
 
     @unittest.skipUnless((Path(__file__).parent.parent/'stairs_mapping/maps/dimensioned_reference_preview/geometry.json').is_file(), 'Optional stairs geometry is not included in the patrol repository')
     def test_fixed_point_stays_on_platform_facing_stair(self):
-        c=json.loads((Path(__file__).parent/'stairs_task_config.json').read_text())
+        c=json.loads((config_path('stairs_task_config.json')).read_text())
         p=c['targets']['stairs_platform_center']
         self.assertEqual(p['z'],0.)
         geometry=json.loads((Path(__file__).parent.parent/'stairs_mapping/maps/dimensioned_reference_preview/geometry.json').read_text())

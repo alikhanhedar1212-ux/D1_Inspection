@@ -60,7 +60,7 @@ class BatteryTests(unittest.TestCase):
                 worker._execute(threading.Event())
                 result = next(e for e in events if e['event']=='battery_result')
                 self.assertEqual(result['success'], ok)
-                self.assertIn('D1_Inspection/voice_navigation/read_battery_native', calls[0][-1])
+                self.assertIn('D1_Inspection/drivers/read_battery_native', calls[0][-1])
                 self.assertTrue(calls[1][-1].endswith(('56' if ok else 'unavailable') + "'"))
                 self.assertFalse(any('cmd_vel' in arg or 'posture' in arg for cmd in calls for arg in cmd))
                 self.assertFalse(worker.busy)

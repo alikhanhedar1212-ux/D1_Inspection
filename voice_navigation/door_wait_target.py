@@ -1,4 +1,5 @@
 """Shared target resolution for downstairs navigation and door handoff."""
+from project_config import map_path
 import math
 from pathlib import Path
 import yaml
@@ -6,8 +7,7 @@ import yaml
 def approach_target(config):
     waypoint_id = config.get('waypoint_2d')
     if waypoint_id is not None:
-        points = yaml.safe_load((Path(__file__).resolve().parents[1] /
-                                 'navigation_localization/waypoints.yaml').read_text())['waypoints']
+        points = yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints']
         target = dict(next(p for p in points if p['id'] == waypoint_id))
     else:
         target = dict(config['approach_target_2d'])

@@ -6,7 +6,8 @@ import json
 import argparse
 import time
 
-ROOT = Path(__file__).parent
+UI_ROOT = Path(__file__).resolve().parent
+ROOT = UI_ROOT.parent / 'voice_navigation'
 
 
 def snapshot():
@@ -44,7 +45,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         route = self.path.split('?', 1)[0]
         if route == '/':
-            data = (ROOT / 'dashboard.html').read_bytes()
+            data = (UI_ROOT / 'dashboard.html').read_bytes()
             content_type = 'text/html; charset=utf-8'
         elif route == '/api/events':
             data = json.dumps(snapshot(), ensure_ascii=False).encode()

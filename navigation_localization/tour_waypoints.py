@@ -1,4 +1,5 @@
 """Visit points 1–6 once, dwelling five seconds between successful goals."""
+from project_config import map_path
 import json
 import argparse
 import math
@@ -78,7 +79,7 @@ def main():
         bridge_ready()
         if not client.wait_for_server(timeout_sec=8):
             raise RuntimeError('导航服务不可用')
-        points = {w['id']: w for w in yaml.safe_load((ROOT/'waypoints.yaml').read_text())['waypoints']}
+        points = {w['id']: w for w in yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints']}
         for point_id in range(len(completed)+1,7):
             bridge_ready()
             waypoint = points[point_id]

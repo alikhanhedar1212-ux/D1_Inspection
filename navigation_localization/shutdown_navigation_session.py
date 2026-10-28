@@ -55,7 +55,7 @@ for pid,(_,args) in ps.items():
     # Only executable arguments, never a shell's embedded command text.
     project_scripts=[a for a in args[1:] if a.endswith('.py') and a.startswith(str(ROOT)+'/') and a!=str(SELF)]
     if Path(args[0]).name.startswith('python') and project_scripts:
-        if any('/navigation_localization/' in a or '/voice_navigation/' in a or '/stairs_mapping/' in a or a==str(ROOT/'camera_receiver.py') for a in project_scripts):roots.add(pid)
+        if any('/navigation_localization/' in a or '/voice_navigation/' in a or '/stairs_mapping/' in a or '/drivers/' in a for a in project_scripts):roots.add(pid)
     if Path(args[0]).name=='rviz2' and any(a.startswith(str(ROOT)+'/') and a.endswith('.rviz') for a in args):roots.add(pid)
     if args[0].startswith(str(ROOT/'stairs_mapping/jie_3d_ws/install')+'/'):roots.add(pid)
     if (Path(args[0]).name=='ssh' and any(setting(role+'_host') in args for role in ('aidlux','firefly'))
@@ -127,9 +127,9 @@ record['remote']=[]
 for host in ('aidlux','firefly'):
     try:
         code=(remote.replace('__HOST__',repr(host))
-              .replace('__NAVDIR__',repr(remote_file(host,'navigation_localization')))
+              .replace('__NAVDIR__',repr(remote_file(host,'drivers')))
               .replace('__VOICEDIR__',repr(remote_file(host,'voice_navigation')))
-              .replace('__CAMERA__',repr(remote_file(host,'','camera_sender_latest.py'))))
+              .replace('__CAMERA__',repr(remote_file(host,'drivers','camera_sender_latest.py'))))
         result=subprocess.run(ssh_command(host,['python3','-'],timeout=5),input=code,capture_output=True,text=True,timeout=15)
         record['remote'].append({'host':host,'returncode':result.returncode,'output':result.stdout,'error':result.stderr})
     except subprocess.TimeoutExpired:record['remote'].append({'host':host,'timeout':True})

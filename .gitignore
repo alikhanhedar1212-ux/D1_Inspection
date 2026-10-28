@@ -33,4 +33,4 @@ vendor/
 .ssh/
 
 config.local.json
-navigation_localization/lio.yaml
+drivers/lio.yaml

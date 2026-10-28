@@ -1,8 +1,9 @@
+from project_config import map_path
 from pathlib import Path
 import numpy as np,yaml,json
 from scipy import ndimage
 from PIL import Image
-root=Path(__file__).parent;m=yaml.safe_load((root/'map.yaml').read_text());grid=np.flipud(np.asarray(Image.open(root/'map.pgm')));res=m['resolution'];origin=np.array(m['origin'][:2]);occ=grid<50;free=grid>250;field=ndimage.distance_transform_edt(~occ)*res;scan=np.load(root/'live_scan.npz');ranges=scan['ranges'];angles=float(scan['angle_min'])+np.arange(len(ranges))*float(scan['angle_increment']);mask=np.isfinite(ranges)&(ranges>.6)&(ranges<15);indices=np.where(mask)[0];indices=indices[np.linspace(0,len(indices)-1,min(120,len(indices))).astype(int)];points=np.column_stack((np.cos(angles[indices])*ranges[indices],np.sin(angles[indices])*ranges[indices]));height,width=grid.shape
+root=Path(__file__).parent;m=yaml.safe_load((map_path('map.yaml')).read_text());grid=np.flipud(np.asarray(Image.open(map_path('map.pgm'))));res=m['resolution'];origin=np.array(m['origin'][:2]);occ=grid<50;free=grid>250;field=ndimage.distance_transform_edt(~occ)*res;scan=np.load(root/'live_scan.npz');ranges=scan['ranges'];angles=float(scan['angle_min'])+np.arange(len(ranges))*float(scan['angle_increment']);mask=np.isfinite(ranges)&(ranges>.6)&(ranges<15);indices=np.where(mask)[0];indices=indices[np.linspace(0,len(indices)-1,min(120,len(indices))).astype(int)];points=np.column_stack((np.cos(angles[indices])*ranges[indices],np.sin(angles[indices])*ranges[indices]));height,width=grid.shape
 clear=ndimage.distance_transform_edt(free)*res;ys,xs=np.where((clear>.25)&(np.indices(grid.shape)[0]%10==0)&(np.indices(grid.shape)[1]%10==0));candidates=np.column_stack((origin[0]+(xs+.5)*res,origin[1]+(ys+.5)*res))
 def score(positions,yaw):
  rotated=points@np.array([[np.cos(yaw),np.sin(yaw)],[-np.sin(yaw),np.cos(yaw)]])

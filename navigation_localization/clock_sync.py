@@ -41,7 +41,7 @@ class ClockSync:
         while not self.closed.is_set():
             selector=None
             try:
-                self.proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'navigation_localization', 'clock_probe.py')], timeout=5),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
+                self.proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'drivers', 'clock_probe.py')], timeout=5),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
                 selector=selectors.DefaultSelector();selector.register(self.proc.stdout,selectors.EVENT_READ)
                 if self.line(selector,10)!='CLOCK_READY':raise ValueError('invalid clock probe hello')
                 while not self.closed.is_set():

@@ -1,4 +1,4 @@
-> 可迁移部署以仓库根目录 README.md 为准。下文包含功能开发历史记录；命令按仓库根目录执行。本机路径按脚本位置自动解析，远端默认 ~/D1_Inspection，可在 config.local.json 修改。
+> 可迁移部署以仓库根目录 README.md 为准。下文包含功能开发历史记录；命令按仓库根目录执行。本机路径按脚本位置自动解析，远端默认 ~/D1_Inspection，可在 drivers/config/config.local.json 修改。
 
 # USB 麦克风语音导航
 
@@ -15,7 +15,7 @@
 
 启动页面服务（监听程序需单独启动）：
 ```bash
-python3 ./voice_navigation/voice_dashboard.py
+python3 ./ui/voice_dashboard.py
 ```
 页面默认监听所有 IPv4 网卡，同一局域网内可通过 `http://电脑局域网IP:8091/` 访问；本机仍可使用上述地址。若需仅限本机，启动时加 `--host 127.0.0.1`。识别事件保存在本地 `ui_events.jsonl`，无外部字体、脚本或网络依赖。“清空显示”只清空当前页面记录，不删除文件。
 
@@ -74,7 +74,7 @@ bash ./voice_navigation/run.sh
 ## 启用实际导航
 
 先启动现有 AidLux 传感器输入、本机导航和 `velocity_bridge.py`，在 RViz 设置并确认实时定位。
-点位配置复用 `../navigation_localization/waypoints.yaml`。其中位置目前标记 `confirmed: false`，需逐个在现场核对坐标和朝向后改为 `true`；未确认点位会拒绝运动。
+点位配置复用 `../maps/waypoints.yaml`。其中位置目前标记 `confirmed: false`，需逐个在现场核对坐标和朝向后改为 `true`；未确认点位会拒绝运动。
 
 ```bash
 bash ./voice_navigation/run.sh --execute
@@ -141,7 +141,7 @@ run.sh 已改为复用 navigation_localization/runtime_env.sh 的 Cyclone DDS �
 
 唤醒“小爱小爱”，听到“我在”后说“还剩多少电”“还有多少电”“查询电量”或“电池电量”。每次在Firefly原生battery_state通道读取至少两帧新数据，校验来源、时间、百分比范围和有效电压，再经AidLux本地语音引擎播报“当前电量百分之……”。不使用历史缓存替代失败结果；数据不可用时播报“暂时无法读取电量，请稍后再试”。
 
-只读查询不取消正在执行的导航，不修改姿态、电量或充电控制；“停止”可取消查询。播报期间抑制自身回声并保留停止识别。读取程序~/D1_Inspection/voice_navigation/read_battery_native，播报~/D1_Inspection/voice_navigation/battery_reply.py，状态battery_status.json。沿用40%音量，按百分比缓存语音。原始电流为uint32回绕值、厂商error位含义尚未解析，本功能不据此判断充电状态或电池健康，仅播报power百分比。
+只读查询不取消正在执行的导航，不修改姿态、电量或充电控制；“停止”可取消查询。播报期间抑制自身回声并保留停止识别。读取程序~/D1_Inspection/drivers/read_battery_native，播报~/D1_Inspection/voice_navigation/battery_reply.py，状态battery_status.json。沿用40%音量，按百分比缓存语音。原始电流为uint32回绕值、厂商error位含义尚未解析，本功能不据此判断充电状态或电池健康，仅播报power百分比。
 
 
 2026-10-23 电量播报开头改用用户下载/当前电量.wav，完整0.96秒当前电量为，后接百分之及实时数字。battery_audio.py保持开头PCM样本不变，将数字重采样到48kHz并加入100ms间隔；缓存键包含两组件哈希，旧整句缓存不再误用。当前数字仍由既有espeak-ng合成，未实现参考音色克隆；整句同音色需求尚待额外数字录音或参考音色引擎。此限制不得描述为已完成同音色数字。

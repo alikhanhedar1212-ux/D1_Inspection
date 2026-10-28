@@ -1,3 +1,4 @@
+from project_config import map_path
 from pathlib import Path
 import time,json
 import rclpy
@@ -8,7 +9,7 @@ rclpy.init();n=rclpy.create_node('load_cleaned_navigation_map');poses=[];n.creat
 end=time.monotonic()+5
 while not poses and time.monotonic()<end:rclpy.spin_once(n,timeout_sec=.1)
 assert poses,'当前定位未收到，停止地图替换';pose=poses[-1]
-c=n.create_client(LoadMap,'/map_server/load_map');assert c.wait_for_service(timeout_sec=5);req=LoadMap.Request();req.map_url=str(Path(__file__).with_name('map.yaml'));f=c.call_async(req);rclpy.spin_until_future_complete(n,f,timeout_sec=10);assert f.done() and f.result().result==0
+c=n.create_client(LoadMap,'/map_server/load_map');assert c.wait_for_service(timeout_sec=5);req=LoadMap.Request();req.map_url=str(map_path('map.yaml'));f=c.call_async(req);rclpy.spin_until_future_complete(n,f,timeout_sec=10);assert f.done() and f.result().result==0
 pub=n.create_publisher(PoseWithCovarianceStamped,'/initialpose',10)
 end=time.monotonic()+2
 while time.monotonic()<end:rclpy.spin_once(n,timeout_sec=.1)

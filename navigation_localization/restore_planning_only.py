@@ -1,4 +1,5 @@
 """Restore perception and planning without a hardware velocity bridge."""
+from project_config import ui_path
 import json
 import os
 import subprocess
@@ -22,8 +23,8 @@ commands = {name: shlex.join(['python3', '-u', str(root / (name + '.py'))]) for 
             'waypoint_markers', 'clearance_map', 'dwb_monitor', 'goal_alignment_monitor',
             'auto_localization')}
 commands['navigation'] = shlex.join(['ros2', 'launch', str(root / 'restore.launch.py')])
-commands['camera_receiver'] = shlex.join(['python3', '-u', str(root.parent / 'camera_receiver.py')])
-commands['rviz'] = shlex.join(['rviz2', '-d', str(root / 'navigation_drive.rviz')])
+commands['camera_receiver'] = shlex.join(['python3', '-u', str(root.parent / 'drivers/camera_receiver.py')])
+commands['rviz'] = shlex.join(['rviz2', '-d', str(ui_path('rviz/navigation_drive.rviz'))])
 pids = {}
 for name, command in commands.items():
     with (root / 'runtime_logs' / (name + '.log')).open('ab') as log:

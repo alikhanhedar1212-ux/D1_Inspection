@@ -1,4 +1,5 @@
 """Initialize AMCL once from fresh, stationary scans; never replace manual poses."""
+from project_config import map_path
 import json
 import math
 import os
@@ -22,7 +23,7 @@ class AutoLocalization(Node):
     def __init__(self):
         super().__init__('automatic_map_localization')
         self.root = Path(__file__).parent
-        self.matcher = Matcher(self.root/'map.yaml')
+        self.matcher = Matcher(map_path('map.yaml'))
         self.buffer = Buffer()
         self.listener = TransformListener(self.buffer, self)
         self.publisher = self.create_publisher(PoseWithCovarianceStamped, '/initialpose', 10)

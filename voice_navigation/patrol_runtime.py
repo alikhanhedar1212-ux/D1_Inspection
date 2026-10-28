@@ -1,4 +1,5 @@
 """Cancellable 2 -> 1 -> 3 -> 4 inspection, using the existing guarded Nav2 bridge."""
+from project_config import behavior_path, config_path, map_path
 import json
 import math
 from pathlib import Path
@@ -207,7 +208,7 @@ class PatrolRuntime:
         if not cov or max(cov[:2]) >= .25 or cov[2] >= .09 or status.get('match', 0) < .45:
             raise MissionError('planning_error')
         goal = self.nav.action_type.Goal()
-        goal.behavior_tree = str(NAV/'navigate_arrival_v2.xml')
+        goal.behavior_tree = str(behavior_path('navigate_arrival_v2.xml'))
         goal.pose.header.frame_id = 'map'
         goal.pose.header.stamp = self.nav.node.get_clock().now().to_msg()
         goal.pose.pose.position.x, goal.pose.pose.position.y = float(point['x']), float(point['y'])
@@ -224,7 +225,7 @@ class PatrolRuntime:
             sys.path.append(str(NAV))
         from terminal_guard import TerminalRotationGuard
         import yaml
-        control = yaml.safe_load((NAV/'motion.yaml').read_text())['controller_server']['ros__parameters']
+        control = yaml.safe_load((config_path('motion.yaml')).read_text())['controller_server']['ros__parameters']
         checker = control['general_goal_checker']
         guard = TerminalRotationGuard(checker['xy_goal_tolerance'], checker['yaw_goal_tolerance'])
         pending = self.goal.get_result_async()
@@ -282,7 +283,7 @@ class PatrolRuntime:
         self._check()
         actual = self.pose()
         import yaml
-        checker = yaml.safe_load((NAV/'motion.yaml').read_text())['controller_server']['ros__parameters']['general_goal_checker']
+        checker = yaml.safe_load((config_path('motion.yaml')).read_text())['controller_server']['ros__parameters']['general_goal_checker']
         distance = math.hypot(actual['x']-point['x'], actual['y']-point['y'])
         error = math.atan2(math.sin(point['yaw']-actual['yaw']),math.cos(point['yaw']-actual['yaw']))
         if distance > position_limit or abs(error) > yaw_limit:
@@ -386,7 +387,7 @@ class PatrolRuntime:
     def start_frontdoor(self, point):
         if self.active or (self.worker and self.worker.is_alive()):
             return
-        self.config = json.loads((ROOT/'patrol_config.json').read_text())
+        self.config = json.loads((map_path('patrol_config.json')).read_text())
         self.cancelled = threading.Event()
         self.return_corridor = None
         self.fault = None
@@ -433,7 +434,7 @@ class PatrolRuntime:
             return
         # Capture the origin at the command, never at a later mission stage.
         try:
-            self.config = json.loads((ROOT/'patrol_config.json').read_text())
+            self.config = json.loads((map_path('patrol_config.json')).read_text())
             home = self.pose()
             if self.config.get('mode') != 'navigation_test':
                 self.detector = load_detector(self.config.get('vision', {}))
@@ -466,7 +467,7 @@ class PatrolRuntime:
                 override = self.config.get('stop_overrides', {}).get(str(ident))
                 if override:
                     import yaml
-                    waypoints = yaml.safe_load((NAV/'waypoints.yaml').read_text())['waypoints']
+                    waypoints = yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints']
                     point = dict(point)
                     point.update(next(w for w in waypoints if w['id'] == override['waypoint_id']))
                     self.report(event='patrol_stop_override', point=ident, destination=point)

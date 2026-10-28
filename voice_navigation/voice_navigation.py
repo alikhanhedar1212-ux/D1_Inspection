@@ -1,4 +1,5 @@
 """Offline voice commands from AidLux USB mic to existing Nav2 action server."""
+from project_config import behavior_path, config_path, map_path
 from project_config import remote_file, ssh_command, setting
 import argparse
 import json
@@ -75,7 +76,7 @@ class Navigator:
             saved = json.loads(state_file.read_text())
             self.last_destination = saved.get('destination')
             self.paused = self.last_destination is not None and saved.get('unfinished', False)
-        amcl = yaml.safe_load((ROOT.parent / 'navigation_localization/amcl.yaml').read_text())
+        amcl = yaml.safe_load((config_path('amcl.yaml')).read_text())
         self.transform_tolerance = float(amcl['amcl']['ros__parameters']['transform_tolerance'])
         self.thread = threading.Thread(target=rclpy.spin, args=(self.node,), daemon=True)
         self.thread.start()
@@ -188,7 +189,7 @@ class Navigator:
                 report(event='rejected', reason='返回起点不可用：' + str(exc))
                 return
         else:
-            config = yaml.safe_load((ROOT.parent / 'navigation_localization/waypoints.yaml').read_text())
+            config = yaml.safe_load((map_path('waypoints.yaml')).read_text())
             self.points = {w['id']: w for w in config['waypoints']}
             point = self.points[command['id']]
             verified = ROOT / 'verified_waypoints.json'
@@ -232,7 +233,7 @@ class Navigator:
             self.patrol.start_frontdoor(point)
             return
         goal = self.action_type.Goal()
-        goal.behavior_tree = str(ROOT.parent / 'navigation_localization/navigate_arrival_v2.xml')
+        goal.behavior_tree = str(behavior_path('navigate_arrival_v2.xml'))
         goal.pose.header.frame_id = 'map'
         goal.pose.header.stamp = self.node.get_clock().now().to_msg()
         goal.pose.pose.position.x = float(point['x'])
@@ -288,7 +289,7 @@ class Navigator:
         try:
             if generation != self.generation:
                 return
-            command = ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'voice_navigation', 'posture_firefly.py'), action], ros=True)
+            command = ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'drivers', 'posture_firefly.py'), action], ros=True)
             if action == 'greet':
                 result = run_greeting(command, playback_command(False, ROOT/'audio', 'greet.wav'),
                                       lambda: generation == self.generation,
@@ -471,7 +472,7 @@ def main():
         import os
         if os.environ.get('ROS_DOMAIN_ID') != '93' or os.environ.get('ROS_LOCALHOST_ONLY') != '1':
             ap.error('执行导航需要 ROS_DOMAIN_ID=93 ROS_LOCALHOST_ONLY=1；请通过 run.sh 启动')
-        config = yaml.safe_load((ROOT.parent / 'navigation_localization/waypoints.yaml').read_text())
+        config = yaml.safe_load((map_path('waypoints.yaml')).read_text())
         navigator = Navigator(config['waypoints'])
     session = WakeSession()
     report(event='waiting_wake', wake_word=WAKE_WORD, window_seconds=30,

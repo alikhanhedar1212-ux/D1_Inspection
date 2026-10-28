@@ -1,4 +1,5 @@
 """One-shot stopped global localization. No velocity or posture publisher."""
+from project_config import map_path
 import argparse
 from collections import deque
 import fcntl
@@ -125,7 +126,7 @@ def run(check_only=False):
         with lock:
             frames = [scans[-11], scans[-6], scans[-1]]
             anchor_time = odoms[0][0]
-        matcher = Matcher(ROOT/'map.yaml')
+        matcher = Matcher(map_path('map.yaml'))
         # A recently verified manual initialization is a prior, not a global hypothesis.
         # Never reuse it after appreciable displacement, heading change or expiry.
         if not check_only:

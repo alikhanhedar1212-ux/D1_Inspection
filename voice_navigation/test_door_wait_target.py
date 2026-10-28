@@ -1,3 +1,4 @@
+from project_config import config_path, map_path
 import json, math, unittest
 import yaml
 from pathlib import Path
@@ -6,8 +7,8 @@ from door_wait_target import approach_target
 class DoorWaitTargetTests(unittest.TestCase):
     def test_waypoint_one_used_for_navigation_and_handoff(self):
         root=Path(__file__).parent
-        config=json.loads((root/'stairs_task_config.json').read_text())
-        original=next(p for p in yaml.safe_load((root.parent/'navigation_localization/waypoints.yaml').read_text())['waypoints'] if p['id']==1)
+        config=json.loads((config_path('stairs_task_config.json')).read_text())
+        original=next(p for p in yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints'] if p['id']==1)
         target=approach_target(config)
         for key in ('x','y','yaw'):self.assertEqual(target[key],original[key])
         self.assertEqual(config['waypoint_2d'],1)
@@ -24,7 +25,7 @@ class DoorWaitTargetTests(unittest.TestCase):
 
     def test_explicit_waypoint_takes_priority_over_retired_custom_target(self):
         config={'approach_target_2d':{'confirmed':True,'x':1,'y':2,'yaw':.3},'waypoint_2d':1}
-        points=yaml.safe_load((Path(__file__).parent.parent/'navigation_localization/waypoints.yaml').read_text())['waypoints']
+        points=yaml.safe_load((map_path('waypoints.yaml')).read_text())['waypoints']
         expected=next(p for p in points if p['id']==1)
         self.assertEqual(approach_target(config)['x'],expected['x'])
         result=approach_target(config);result['x']=99
