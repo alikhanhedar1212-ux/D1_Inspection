@@ -9,6 +9,16 @@ import time
 UI_ROOT = Path(__file__).resolve().parent
 ROOT = UI_ROOT.parent / 'src' / 'voice_navigation'
 
+# YOLO 检测直播服务（yolo/src/yolo_web.py，跑在宿主机 GPU 上）的端口。
+# 浏览器访问本页 /video 时 302 直接跳过去，画面不经过本服务中转。
+YOLO_STREAM_PORT = 8092
+
+
+def yolo_stream_url(handler):
+    # 用浏览器访问仪表盘所用的地址替换端口，局域网/本机、任意网卡都适用
+    host = (handler.headers.get('Host') or '127.0.0.1').split(':', 1)[0]
+    return f'http://{host}:{YOLO_STREAM_PORT}/video'
+
 
 def snapshot():
     events = []
@@ -50,6 +60,13 @@ class Handler(BaseHTTPRequestHandler):
         elif route == '/api/events':
             data = json.dumps(snapshot(), ensure_ascii=False).encode()
             content_type = 'application/json; charset=utf-8'
+        elif route == '/video':
+            # 跳转到 YOLO 直播（yolo_web.py）；未启动时浏览器端显示提示并自动重试
+            self.send_response(302)
+            self.send_header('Location', yolo_stream_url(self))
+            self.send_header('Cache-Control', 'no-store')
+            self.end_headers()
+            return
         else:
             self.send_error(404)
             return
