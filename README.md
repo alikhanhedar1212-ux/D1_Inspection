@@ -1,6 +1,6 @@
 # 机器狗语音巡检与实时文字 UI
 
-代码按所在目录自动定位资源，可克隆到任意目录，无需修改源码中的用户名或本机路径。远端 SSH、部署目录和音频设备统一配置在 `src/drivers/config/config.local.json`。
+代码按所在目录自动定位资源，可克隆到任意目录，无需修改源码中的用户名或本机路径。远端 SSH、部署目录和音频设备统一配置在 `config/config.local.json`。
 
 ## 目录结构
 
@@ -10,18 +10,18 @@ D1_Inspection/
 ├── UI/                           # 网页、HTTP 服务及 RViz 显示配置
 ├── maps/                         # 地图、语音点位、巡检点位
 ├── src/
-│   ├── drivers/                  # 设备驱动和配置
-│   │   └── config/               # SSH、设备、ROS、DDS 参数
+│   ├── drivers/                  # 设备驱动与底层接口
 │   ├── navigation_localization/  # 定位、规划、控制桥和启动器
 │   │   └── behavior_trees/       # 导航行为树 XML
-│   ├── voice_navigation/         # 语音识别和巡检流程
-│   └── tests/                    # 项目迁移和目录引用测试
+│   └── voice_navigation/         # 语音识别和巡检流程
+├── config/                       # SSH、设备、ROS、DDS 参数
+├── tests/                        # 项目迁移和目录引用测试
 ├── deployment.py                 # 统一路径与设备配置读取
 ├── doctor.py                     # 依赖和资源检查
 └── requirements.txt
 ```
 
-驱动配置只需在 `src/drivers/config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `UI/`。各目录的 README 说明了入口和用途。
+驱动配置只需在 `config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `UI/`。各目录的 README 说明了入口和用途。
 
 ## 当前功能
 
@@ -45,7 +45,7 @@ python3 UI/voice_dashboard.py
 ## 配置设备
 
 ```bash
-cp src/drivers/config/config.example.json src/drivers/config/config.local.json
+cp config/config.example.json config/config.local.json
 ```
 
 在电脑、AidLux 和 Firefly 上部署同一份源码。远端默认目录为各自登录用户的 `~/D1_Inspection`；如果改了目录名或放到其他位置，在电脑的配置中修改 `aidlux_root` / `firefly_root`。路径可以包含空格，`~` 在远端展开。远端设备自己的配置也需设置本机所用 ROS 环境和音频设备。
@@ -57,12 +57,12 @@ cp src/drivers/config/config.example.json src/drivers/config/config.local.json
 - `firefly_workspace_setup`：Firefly 厂商驱动 setup 文件。
 - `microphone` / `speaker`：PulseAudio 设备名，分别用 `pactl list short sources` / `pactl list short sinks` 查询。本机收音可用 `--source` 明确指定输入。
 - `camera_device`：AidLux 摄像头设备，默认 `/dev/video2`。
-- `mapping_config`：AidLux 的 FAST-LIO 模板，默认相对于其仓库根目录的 `src/drivers/config/lio.template.yaml`。示例保留原设备雷达外参，换设备需要校准。
+- `mapping_config`：AidLux 的 FAST-LIO 模板，默认相对于其仓库根目录的 `config/lio.template.yaml`。示例保留原设备雷达外参，换设备需要校准。
 - 远端 ROS 域默认 AidLux 为 0、Firefly 为 24；本机导航域为 93。
 
 已有设备目录结构不同，也可设置 `aidlux_drivers_dir`、`aidlux_voice_navigation_dir`、`firefly_drivers_dir`、`firefly_voice_navigation_dir`，分别覆盖远端模块目录。
 
-`src/drivers/config/config.local.json` 已被 Git 忽略。可用 `D1_CONFIG` 指定其他 JSON 配置文件；该环境变量只对设置它的机器生效，不会自动复制到远端。
+`config/config.local.json` 已被 Git 忽略。可用 `D1_CONFIG` 指定其他 JSON 配置文件；该环境变量只对设置它的机器生效，不会自动复制到远端。
 
 ## 安装本机依赖
 

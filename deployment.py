@@ -18,12 +18,12 @@ DEFAULTS = {
     'microphone': 'alsa_input.usb-Newmine_Newmine_20180508-00.analog-stereo',
     'speaker': 'alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo',
     'camera_device': '/dev/video2',
-    'mapping_config': 'src/drivers/config/lio.template.yaml',
+    'mapping_config': 'config/lio.template.yaml',
 }
 
 
 def load_settings():
-    path = Path(os.environ.get('D1_CONFIG', ROOT / 'src/drivers/config/config.local.json')).expanduser()
+    path = Path(os.environ.get('D1_CONFIG', ROOT / 'config/config.local.json')).expanduser()
     settings = dict(DEFAULTS)
     if path.is_file():
         overrides = json.loads(path.read_text())
@@ -41,7 +41,7 @@ def setting(name):
 
 
 def config_path(name):
-    return ROOT / 'src' / 'drivers' / 'config' / name
+    return ROOT / 'config' / name
 
 
 def map_path(name):

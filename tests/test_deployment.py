@@ -11,7 +11,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import deployment
 
 
@@ -51,8 +51,8 @@ class DeploymentTests(unittest.TestCase):
     def test_motion_trees_follow_a_relocated_clone(self):
         with tempfile.TemporaryDirectory() as directory:
             clone = Path(directory)/'different project name with spaces'
-            (clone/'src/drivers/config').mkdir(parents=True)
-            shutil.copy2(deployment.config_path('motion.yaml'),clone/'src/drivers/config/motion.yaml')
+            (clone/'config').mkdir(parents=True)
+            shutil.copy2(deployment.config_path('motion.yaml'),clone/'config/motion.yaml')
             with patch.object(deployment, 'ROOT', clone):
                 params = deployment.motion_parameters()
                 self.assertEqual(params['default_nav_to_pose_bt_xml'], str(clone/'src/navigation_localization/behavior_trees/navigate_arrival_v2.xml'))
@@ -64,14 +64,14 @@ class DeploymentTests(unittest.TestCase):
             clone = Path(directory)/'renamed clone with spaces'
             nav = clone/'src/navigation_localization'
             nav.mkdir(parents=True)
-            (clone/'src/drivers/config').mkdir(parents=True)
+            (clone/'config').mkdir(parents=True)
             shutil.copy2(deployment.ROOT/'src/navigation_localization/runtime_env.sh',nav/'runtime_env.sh')
-            shutil.copy2(deployment.config_path('cyclonedds.xml'),clone/'src/drivers/config/cyclonedds.xml')
+            shutil.copy2(deployment.config_path('cyclonedds.xml'),clone/'config/cyclonedds.xml')
             setup = Path(directory)/'ROS setup.bash'
             setup.write_text('export FAKE_ROS_READY=yes\n')
             command = f'source {shlex.quote(str(nav/"runtime_env.sh"))} && printf "%s\\n" "$FAKE_ROS_READY" "$CYCLONEDDS_URI"'
             result = subprocess.run(['bash','-c',command],env=dict(os.environ,D1_ROS_SETUP=str(setup)),cwd='/',capture_output=True,text=True,check=True)
-            self.assertEqual(result.stdout.splitlines(), ['yes', f'file://{clone}/src/drivers/config/cyclonedds.xml'])
+            self.assertEqual(result.stdout.splitlines(), ['yes', f'file://{clone}/config/cyclonedds.xml'])
 
     def test_config_file_overrides_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

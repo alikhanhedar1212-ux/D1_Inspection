@@ -14,5 +14,5 @@ if [[ -d "$NAV_CYCLONE_PREFIX" ]]; then
     export LD_LIBRARY_PATH="$NAV_CYCLONE_PREFIX/lib:$NAV_CYCLONE_PREFIX/lib/x86_64-linux-gnu:${LD_LIBRARY_PATH:-}"
 fi
 export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp ROS_DOMAIN_ID=93 ROS_LOCALHOST_ONLY=1
-NAV_CONFIG_ROOT="$(cd -- "$NAV_RUNTIME_ROOT/../drivers/config" && pwd)"
+NAV_CONFIG_ROOT="$(cd -- "$NAV_RUNTIME_ROOT/../../config" && pwd)"
 export CYCLONEDDS_URI="file://$NAV_CONFIG_ROOT/cyclonedds.xml"

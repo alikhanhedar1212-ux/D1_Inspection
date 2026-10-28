@@ -10,6 +10,6 @@
   "firefly_domain": 24,
   "microphone": "alsa_input.usb-Newmine_Newmine_20180508-00.analog-stereo",
   "speaker": "alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo",
-  "mapping_config": "src/drivers/config/lio.template.yaml",
+  "mapping_config": "config/lio.template.yaml",
   "camera_device": "/dev/video2"
 }

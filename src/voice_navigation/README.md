@@ -1,4 +1,4 @@
-> 可迁移部署以仓库根目录 README.md 为准。下文包含功能开发历史记录；命令按仓库根目录执行。本机路径按脚本位置自动解析，远端默认 ~/D1_Inspection，可在 src/drivers/config/config.local.json 修改。
+> 可迁移部署以仓库根目录 README.md 为准。下文包含功能开发历史记录；命令按仓库根目录执行。本机路径按脚本位置自动解析，远端默认 ~/D1_Inspection，可在 config/config.local.json 修改。
 
 # USB 麦克风语音导航
 
