@@ -1,0 +1,64 @@
+planner_server:
+  ros__parameters:
+    use_sim_time: false
+    expected_planner_frequency: 1.0
+    planner_plugins:
+    - GridBased
+    GridBased:
+      plugin: nav2_navfn_planner/NavfnPlanner
+      tolerance: 0.15
+      use_astar: true
+      allow_unknown: false
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: map
+      robot_base_frame: nav_body
+      resolution: 0.05
+      update_frequency: 2.0
+      publish_frequency: 1.0
+      transform_tolerance: 0.5
+      footprint: '[[0.325,0.20],[0.325,-0.20],[-0.325,-0.20],[-0.325,0.20]]'
+      footprint_padding: 0.05
+      track_unknown_space: true
+      plugins:
+      - static_layer
+      - obstacle_layer
+      - inflation_layer
+      static_layer:
+        plugin: nav2_costmap_2d::StaticLayer
+        map_subscribe_transient_local: true
+        map_topic: /clearance_planning_map
+        trinary_costmap: false
+      obstacle_layer:
+        plugin: spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer
+        enabled: true
+        voxel_decay: 5.0
+        decay_model: 0
+        voxel_size: 0.05
+        track_unknown_space: true
+        mark_threshold: 0
+        update_footprint_enabled: true
+        combination_method: 1
+        publish_voxel_map: true
+        mapping_mode: false
+        transform_tolerance: 0.5
+        observation_sources: marking
+        marking:
+          topic: /obstacle_points
+          data_type: PointCloud2
+          marking: true
+          clearing: false
+          obstacle_range: 5.0
+          min_obstacle_height: -1.0
+          max_obstacle_height: 3.0
+          observation_persistence: 0.0
+          expected_update_rate: 0.7
+          clear_after_reading: true
+          filter: passthrough
+      inflation_layer:
+        plugin: nav2_costmap_2d::InflationLayer
+        inflation_radius: 1.2
+        cost_scaling_factor: 1.8
+      always_send_full_costmap: true

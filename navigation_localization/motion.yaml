@@ -1,0 +1,200 @@
+controller_server:
+  ros__parameters:
+    use_sim_time: false
+    controller_frequency: 10.0
+    min_x_velocity_threshold: 0.001
+    min_y_velocity_threshold: 0.001
+    min_theta_velocity_threshold: 0.001
+    failure_tolerance: 1.0
+    progress_checker_plugin: progress_checker
+    goal_checker_plugins:
+    - general_goal_checker
+    controller_plugins:
+    - FollowPath
+    progress_checker:
+      plugin: nav2_controller::SimpleProgressChecker
+      required_movement_radius: 0.15
+      movement_time_allowance: 45.0
+    # Latch terminal rotation through position jitter; the final goal checker below
+    # stays non-stateful and still requires position and heading simultaneously.
+    .position_checker.stateful: true
+    .position_checker.xy_goal_tolerance: 0.30
+    general_goal_checker:
+      stateful: false
+      plugin: nav2_controller::SimpleGoalChecker
+      xy_goal_tolerance: 0.30
+      yaw_goal_tolerance: 0.2617993878
+    FollowPath:
+      plugin: nav2_rotation_shim_controller::RotationShimController
+      debug_trajectory_details: true
+      min_vel_x: 0.0
+      min_vel_y: 0.0
+      max_vel_x: 0.3
+      max_vel_y: 0.0
+      max_vel_theta: 0.35
+      min_speed_xy: 0.0
+      max_speed_xy: 0.3
+      min_speed_theta: 0.0
+      acc_lim_x: 0.25
+      acc_lim_y: 0.0
+      acc_lim_theta: 1.5
+      decel_lim_x: -0.3
+      decel_lim_y: 0.0
+      decel_lim_theta: -0.7
+      vx_samples: 12
+      vy_samples: 1
+      vtheta_samples: 40
+      sim_time: 2.0
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.5
+      xy_goal_tolerance: 0.30
+      trans_stopped_velocity: 0.03
+      short_circuit_trajectory_evaluation: true
+      stateful: true
+      critics:
+      - RotateToGoal
+      - Oscillation
+      - ObstacleFootprint
+      - BaseObstacle
+      - GoalAlign
+      - PathAlign
+      - PathDist
+      - GoalDist
+      BaseObstacle.scale: 0.1
+      PathAlign.scale: 32.0
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.scale: 24.0
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+      RotateToGoal.scale: 32.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: 0.5
+      ObstacleFootprint.scale: 0.2
+      rotate_to_goal_heading: true
+      # Ramp from the previous command; delayed/noisy odometry still monitors pose.
+      closed_loop: false
+      primary_controller: dwb_core::DWBLocalPlanner
+      angular_dist_threshold: 0.35
+      forward_sampling_distance: 0.8
+      rotate_to_heading_angular_vel: 0.2
+      max_angular_accel: 0.4
+      simulate_ahead_time: 1.5
+    odom_topic: /body_odom
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: false
+      global_frame: nav_odom
+      robot_base_frame: nav_body
+      resolution: 0.05
+      update_frequency: 10.0
+      publish_frequency: 3.0
+      transform_tolerance: 0.5
+      footprint: '[[0.325,0.20],[0.325,-0.20],[-0.325,-0.20],[-0.325,0.20]]'
+      footprint_padding: 0.05
+      track_unknown_space: true
+      plugins:
+      - static_layer
+      - obstacle_layer
+      - inflation_layer
+      static_layer:
+        plugin: nav2_costmap_2d::StaticLayer
+        map_subscribe_transient_local: true
+      obstacle_layer:
+        plugin: spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer
+        enabled: true
+        voxel_decay: 3.0
+        decay_model: 0
+        voxel_size: 0.05
+        track_unknown_space: true
+        mark_threshold: 0
+        update_footprint_enabled: true
+        combination_method: 1
+        publish_voxel_map: true
+        mapping_mode: false
+        transform_tolerance: 0.5
+        observation_sources: marking
+        marking:
+          topic: /obstacle_points
+          data_type: PointCloud2
+          marking: true
+          clearing: false
+          obstacle_range: 5.0
+          min_obstacle_height: -1.0
+          max_obstacle_height: 3.0
+          observation_persistence: 0.0
+          expected_update_rate: 0.7
+          clear_after_reading: true
+          filter: passthrough
+      inflation_layer:
+        plugin: nav2_costmap_2d::InflationLayer
+        inflation_radius: 1.2
+        cost_scaling_factor: 1.8
+      always_send_full_costmap: true
+      rolling_window: true
+      width: 6
+      height: 6
+bt_navigator:
+  ros__parameters:
+    use_sim_time: false
+    global_frame: map
+    robot_base_frame: nav_body
+    odom_topic: /body_odom
+    always_reload_bt_xml: true
+    bt_loop_duration: 10
+    default_server_timeout: 1000
+    wait_for_service_timeout: 1000
+    plugin_lib_names:
+    - terminal_replan_bt_node
+    - nav2_compute_path_to_pose_action_bt_node
+    - nav2_compute_path_through_poses_action_bt_node
+    - nav2_smooth_path_action_bt_node
+    - nav2_follow_path_action_bt_node
+    - nav2_spin_action_bt_node
+    - nav2_wait_action_bt_node
+    - nav2_assisted_teleop_action_bt_node
+    - nav2_back_up_action_bt_node
+    - nav2_drive_on_heading_bt_node
+    - nav2_clear_costmap_service_bt_node
+    - nav2_is_stuck_condition_bt_node
+    - nav2_goal_reached_condition_bt_node
+    - nav2_goal_updated_condition_bt_node
+    - nav2_globally_updated_goal_condition_bt_node
+    - nav2_is_path_valid_condition_bt_node
+    - nav2_initial_pose_received_condition_bt_node
+    - nav2_reinitialize_global_localization_service_bt_node
+    - nav2_rate_controller_bt_node
+    - nav2_distance_controller_bt_node
+    - nav2_speed_controller_bt_node
+    - nav2_truncate_path_action_bt_node
+    - nav2_truncate_path_local_action_bt_node
+    - nav2_goal_updater_node_bt_node
+    - nav2_recovery_node_bt_node
+    - nav2_pipeline_sequence_bt_node
+    - nav2_round_robin_node_bt_node
+    - nav2_transform_available_condition_bt_node
+    - nav2_time_expired_condition_bt_node
+    - nav2_path_expiring_timer_condition
+    - nav2_distance_traveled_condition_bt_node
+    - nav2_single_trigger_bt_node
+    - nav2_goal_updated_controller_bt_node
+    - nav2_is_battery_low_condition_bt_node
+    - nav2_navigate_through_poses_action_bt_node
+    - nav2_navigate_to_pose_action_bt_node
+    - nav2_remove_passed_goals_action_bt_node
+    - nav2_planner_selector_bt_node
+    - nav2_controller_selector_bt_node
+    - nav2_goal_checker_selector_bt_node
+    - nav2_controller_cancel_bt_node
+    - nav2_path_longer_on_approach_bt_node
+    - nav2_wait_cancel_bt_node
+    - nav2_spin_cancel_bt_node
+    - nav2_back_up_cancel_bt_node
+    - nav2_assisted_teleop_cancel_bt_node
+    - nav2_drive_on_heading_cancel_bt_node
+    - nav2_is_battery_charging_condition_bt_node
+    transform_tolerance: 0.5
+    default_nav_to_pose_bt_xml: /home/hcb/aidlux_mapping_view/navigation_localization/navigate_arrival_v2.xml
+    default_nav_through_poses_bt_xml: /home/hcb/aidlux_mapping_view/navigation_localization/navigate_through.xml

@@ -1,0 +1,32 @@
+{
+  "device_normal": {
+    "file": "/home/hcb/aidlux_mapping_view/voice_navigation/audio/device_normal.wav",
+    "duration": 1.18,
+    "sha256": "44277a6d5d937e15bf0e6e0f5f2fbfd654e4c3e733c6a504c3af78e264f9e1a8",
+    "deployed": true
+  },
+  "device_missing": {
+    "file": "/home/hcb/aidlux_mapping_view/voice_navigation/audio/device_missing.wav",
+    "duration": 0.96,
+    "sha256": "e6ad74927c0f534402c876b0a3000a763000a4dacf113c1202046fd229e906fc",
+    "deployed": true
+  },
+  "camera_error": {
+    "file": "/home/hcb/aidlux_mapping_view/voice_navigation/audio/camera_error.wav",
+    "duration": 1.15,
+    "sha256": "621ee43145f8a046e592dcf254355467e69a70b0a1f0cdbc1a97182e5ba5b961",
+    "deployed": true
+  },
+  "planning_error": {
+    "file": "/home/hcb/aidlux_mapping_view/voice_navigation/audio/planning_error.wav",
+    "duration": 1.2,
+    "sha256": "661987d28a24b513c10b856b825a4ec2ba0d841041576c27b523cc28bba9e2a8",
+    "deployed": true
+  },
+  "sign_error": {
+    "file": "/home/hcb/aidlux_mapping_view/voice_navigation/audio/sign_error.wav",
+    "duration": 1.52,
+    "sha256": "78a09928dfb772213f3a6077281317a9a1694f33773270b0cd1429dd2956072f",
+    "deployed": true
+  }
+}

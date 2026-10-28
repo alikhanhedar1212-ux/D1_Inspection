@@ -1,0 +1,133 @@
+{
+  "order": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "observation_seconds": 10,
+  "navigation_timeout_seconds": 180,
+  "source": "用户截图估算，现场需校准",
+  "points": {
+    "1": {
+      "x": -0.1364666808027597,
+      "y": -3.39930400639001,
+      "yaw": 3.148559710861872,
+      "kind": "extinguisher",
+      "calibrated": true,
+      "calibrated_at": 1792997808.4984553,
+      "confirmation": "用户要求巡检P1再向地图右方map+X移动0.20m，朝向保持，2026-10-27"
+    },
+    "2": {
+      "x": -18.314848554370386,
+      "y": -4.714351507046586,
+      "yaw": 1.6260092795020247,
+      "kind": "extinguisher",
+      "calibrated": true,
+      "calibrated_at": 1793148738.8892348,
+      "confirmation": "用户要求P2位置与方向同步为2号洗手间点，2026-10-28"
+    },
+    "3": {
+      "x": -14.031150882506394,
+      "y": -12.467212614529103,
+      "yaw": -0.08846853815832859,
+      "kind": "extinguisher",
+      "calibrated": true,
+      "calibrated_at": 1793080044.1882317,
+      "confirmation": "用户指定当前机器狗实际位置和朝向为P3"
+    },
+    "4": {
+      "x": -4.109949368682204,
+      "y": -10.22510605488775,
+      "yaw": -0.04403771314016762,
+      "kind": "sign",
+      "calibrated": true,
+      "calibrated_at": 1793080145.6556532,
+      "confirmation": "用户指定当前机器狗实际位置和朝向为P4"
+    }
+  },
+  "return_routes": {
+    "left": [
+      {
+        "x": -5.538,
+        "y": -7.457,
+        "yaw": 0
+      },
+      {
+        "x": -4.855,
+        "y": -6.378,
+        "yaw": 0
+      },
+      {
+        "x": -1.347,
+        "y": -5.396,
+        "yaw": 0
+      },
+      {
+        "x": 0.017,
+        "y": -4.218,
+        "yaw": 0
+      }
+    ],
+    "right": [
+      {
+        "x": -3.686,
+        "y": -11.8,
+        "yaw": 0
+      },
+      {
+        "x": -1.25,
+        "y": -11.8,
+        "yaw": 0
+      },
+      {
+        "x": -0.08,
+        "y": -10.403,
+        "yaw": 0
+      },
+      {
+        "x": -0.275,
+        "y": -7.654,
+        "yaw": 0
+      },
+      {
+        "x": 0.017,
+        "y": -4.218,
+        "yaw": 0
+      }
+    ]
+  },
+  "map_extension": {
+    "source": "offline_2d_20261009/map.pgm",
+    "processing": "原始3D雷达扫描校平/去畸变/高度切片/射线建图投影",
+    "edited_bounds": {
+      "x": [
+        -20.2,
+        -16.2
+      ],
+      "y": [
+        -4.6,
+        3.3
+      ]
+    },
+    "unknown_preserved": true,
+    "report": "/home/hcb/aidlux_mapping_view/navigation_localization/washroom_restore_report.json"
+  },
+  "backup": "/home/hcb/aidlux_mapping_view/navigation_localization/backups/patrol_20261026_135844",
+  "vision": {
+    "backend": "external",
+    "module": null,
+    "status": "等待用户提供训练好的模型与推理说明"
+  },
+  "mode": "navigation_test",
+  "arrival_validation": {
+    "position_m": 1.0,
+    "yaw_degrees": 15.0
+  },
+  "stop_overrides": {
+    "2": {
+      "waypoint_id": 2,
+      "name": "洗手间"
+    }
+  }
+}

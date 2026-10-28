@@ -1,0 +1,44 @@
+frame_id: map
+status: 从截图估算，位置和朝向待现场核对
+waypoints:
+- id: 1
+  name: 正门
+  x: -10.485371
+  y: -5.352113
+  yaw: 1.5707963267948966
+  confirmed: true
+  confirmation_source: 用户要求正门1号点按目标朝向左移0.50m（map-X减0.50m），2026-10-27
+- id: 2
+  name: 洗手间
+  x: -18.314848554370386
+  y: -4.714351507046586
+  yaw: 1.6260092795020247
+  confirmed: true
+  confirmation_source: 用户指定当前机器狗实际位置及机身朝向为洗手间2号点，2026-10-27
+- id: 3
+  name: 放映厅
+  x: -24.8
+  y: -0.4
+  yaw: 1.5707963267948966
+  confirmed: false
+- id: 4
+  name: 展示区起点
+  x: -24.2
+  y: -9.3
+  yaw: 0.0
+  confirmed: true
+  confirmation_source: 用户截图绿色箭头指定展厅起点朝地图右方map+X，2026-10-27
+- id: 5
+  name: 展示区中心
+  x: -11.0
+  y: -10.1
+  yaw: 3.141592653589793
+  confirmed: true
+  confirmation_source: 用户截图绿色箭头指定展厅中心朝地图左方map-X，2026-10-27
+- id: 6
+  name: 窗户
+  x: 0.3
+  y: -5.0
+  yaw: 0.0
+  confirmed: true
+  confirmation_source: 用户截图绿色箭头指定窗户点朝地图右方map+X，2026-10-27

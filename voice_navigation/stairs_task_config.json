@@ -1,0 +1,92 @@
+{
+  "execution_enabled": false,
+  "scope": "wait_before_first_door_no_crossing",
+  "waypoint_2d": 1,
+  "frame_3d": "stairs_design",
+  "door_1": {
+    "type": "glass_door",
+    "position_confirmed": false,
+    "approx_distance_ahead_of_waypoint_1_m": 0.8,
+    "position_source": "用户描述约0.8米，尚未实测"
+  },
+  "targets": {
+    "door_2_wait": {
+      "x": 7.352269732945741,
+      "y": 0.5309829630898889,
+      "z": 0.0,
+      "yaw": -1.4571374177237728,
+      "confirmed": false
+    },
+    "stairs_platform_center": {
+      "x": 6.6648094460889995,
+      "y": -2.6879223108535015,
+      "z": 0.0,
+      "yaw": -3.1068531959478594,
+      "confirmed": false,
+      "user_intent_confirmed": true,
+      "note": "下楼准备点：参考定位暂定，到达后停车，尚未允许自动下楼"
+    },
+    "door_1_inside_wait": {
+      "x": 0.5,
+      "y": 0.7,
+      "z": 0.0,
+      "yaw": 0,
+      "confirmed": false,
+      "note": "需现场核对本侧停靠点与净空"
+    },
+    "door_1_outside_wait": {
+      "x": 1.5,
+      "y": 0.7,
+      "z": 0.0,
+      "yaw": 3.141592653589793,
+      "confirmed": false,
+      "note": "需现场核对本侧停靠点与净空"
+    },
+    "door_2_inside_wait": {
+      "x": 7.352269732945741,
+      "y": 0.5309829630898889,
+      "z": 0.0,
+      "yaw": -1.4571374177237728,
+      "confirmed": false,
+      "note": "需现场核对本侧停靠点与净空"
+    },
+    "door_2_outside_wait": {
+      "x": 7.352269732945741,
+      "y": -0.5,
+      "z": 0.0,
+      "yaw": 1.5707963267948966,
+      "confirmed": false,
+      "note": "需现场核对本侧停靠点与净空"
+    }
+  },
+  "map_alignment_confirmed": false,
+  "localization_3d_verified": false,
+  "controller_3d_verified": false,
+  "phrases": {
+    "request_open_door": "请帮我开门",
+    "confirm_door_open": "是否同意我通过这扇门？请确认门已打开且通道安全，同意请说确认。",
+    "permit_door_1_enter": "我准备从1号门进入，是否同意通行？请确认门已打开且通道安全，同意请说确认。",
+    "permit_door_1_exit": "我准备从1号门出去，是否同意通行？请确认门已打开且通道安全，同意请说确认。",
+    "permit_door_2_enter": "我准备从2号门进入，是否同意通行？请确认门已打开且通道安全，同意请说确认。",
+    "permit_door_2_exit": "我准备从2号门出去，是否同意通行？请确认门已打开且通道安全，同意请说确认。",
+    "map_3d_ready": "已切换到三维地图，起始位置和朝向已确认。"
+  },
+  "wait_after_request_seconds": 5,
+  "confirmation": "确认",
+  "requires_measured_door_1_clearance": true,
+  "note": "当前仅导航至已确认1号点附近，停稳并请求开门后持续等待；确认不触发运动，不穿门、不下楼。未启用门框自动识别或居中。",
+  "speech_backend": "aidlux_native_cached_wav",
+  "speech_remote_script": "/home/aidlux/voice_navigation/aidlux_native_speech.py",
+  "body_frame_3d": "stairs_body",
+  "door_passage_policy": {
+    "both_directions": true,
+    "fresh_confirmation_per_crossing": true,
+    "consume_on_crossing": true
+  },
+  "handoff_only": true,
+  "arrival_tolerance": {
+    "position_m": 0.3,
+    "yaw_rad": 0.2617993878
+  },
+  "first_door_wait_only": true
+}

@@ -1,0 +1,15 @@
+behavior_server:
+  ros__parameters:
+    costmap_topic: /local_costmap/costmap_raw
+    footprint_topic: /local_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: [spin]
+    spin:
+      plugin: nav2_behaviors/Spin
+    global_frame: nav_odom
+    robot_base_frame: nav_body
+    transform_tolerance: 0.2
+    simulate_ahead_time: 2.0
+    max_rotational_vel: 0.35
+    min_rotational_vel: 0.1
+    rotational_acc_lim: 0.3

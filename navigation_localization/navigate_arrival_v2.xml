@@ -1,0 +1,13 @@
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <PipelineSequence>
+      <!-- RateController must remain outside TerminalReplan so its timer survives a successful plan. -->
+      <RateController hz="1.0">
+        <TerminalReplan goal="{goal}" radius="0.30" robot_base_frame="nav_body">
+          <ComputePathToPose goal="{goal}" path="{path}" planner_id="GridBased"/>
+        </TerminalReplan>
+      </RateController>
+      <FollowPath path="{path}" controller_id="FollowPath" goal_checker_id="general_goal_checker"/>
+    </PipelineSequence>
+  </BehaviorTree>
+</root>
