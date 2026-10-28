@@ -20,6 +20,8 @@ import sys
 
 WINDOW_TITLE = "YOLO on Go2"
 DEFAULT_MODEL = os.path.join("outputs", "train_noflip", "weights", "best.pt")
+# yolo/ 根目录（本文件位于 yolo/src/ 下），用于在任意启动目录下解析相对路径
+_YOLO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def parse_args():
@@ -55,8 +57,17 @@ def resolve_model_path(arg):
 
     依次尝试：权重文件本身 -> 实验目录（补 weights/best.pt）-> outputs 下的
     实验名。未指定时先看默认路径，再退回 outputs 下最新的 best.pt。
-    找不到任何权重时退出并报错。
+    相对路径先按当前目录解析，找不到再按脚本所在的 yolo/ 目录解析，
+    因此在仓库任意层级启动都能找到权重。找不到任何权重时退出并报错。
     """
+    def find(rel):
+        # 先按当前工作目录（向后兼容），再按 yolo/ 根目录解析
+        for base in (os.getcwd(), _YOLO_ROOT):
+            p = os.path.join(base, rel)
+            if os.path.isfile(p):
+                return os.path.abspath(p)
+        return None
+
     if arg:
         candidates = [
             arg,
@@ -64,22 +75,23 @@ def resolve_model_path(arg):
             os.path.join("outputs", arg, "weights", "best.pt"),
         ]
         for c in candidates:
-            p = os.path.abspath(c)
-            if os.path.isfile(p):
+            p = find(c)
+            if p:
                 return p
         sys.exit(f"错误：找不到模型权重：{arg}\n"
-                 f"可传 best.pt 路径、实验目录或实验名（如 train_exp-3）。")
+                 f"可传 best.pt 路径、实验目录或实验名（如 train_noflip）。")
 
-    default_p = os.path.abspath(DEFAULT_MODEL)
-    if os.path.isfile(default_p):
-        return default_p
+    p = find(DEFAULT_MODEL)
+    if p:
+        return p
 
-    bests = [os.path.abspath(p) for p in
-             glob.glob(os.path.join("outputs", "*", "weights", "best.pt"))]
+    bests = []
+    for base in (os.getcwd(), _YOLO_ROOT):
+        bests += glob.glob(os.path.join(base, "outputs", "*", "weights", "best.pt"))
     if bests:
         newest = max(bests, key=os.path.getmtime)
         print(f"提示：默认权重 {DEFAULT_MODEL} 不存在，已自动改用最新的实验：{newest}")
-        return newest
+        return os.path.abspath(newest)
 
     sys.exit("错误：outputs 下找不到任何训练权重，请先运行 src/train.py 训练。")
 
