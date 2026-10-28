@@ -1,19 +1,9 @@
-import argparse
-import os
-from pathlib import Path
-
-parser = argparse.ArgumentParser(description='使用 COCO person 类别检测视频中的人员')
-parser.add_argument('--source', default=os.environ.get('D1_CAMERA_URL'), help='视频路径或 RTSP 地址，也可设置 D1_CAMERA_URL')
-args = parser.parse_args()
-if not args.source:
-    parser.error('请用 --source 指定视频地址，或设置 D1_CAMERA_URL')
-
 import cv2
 from ultralytics import YOLO
 
-model = YOLO(str(Path(__file__).resolve().parents[1] / 'models/yolov8n.pt'))
+model = YOLO('yolov8n.pt')
 
-rtsp_url = args.source
+rtsp_url = "rtsp://192.168.3.100:8554/test?tcp"
 
 cap = cv2.VideoCapture(rtsp_url)
 cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)

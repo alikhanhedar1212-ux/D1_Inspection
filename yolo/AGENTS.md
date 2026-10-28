@@ -54,7 +54,7 @@ python src/train.py --epochs 200 --batch 8   # 自定义轮数与批量
 ### 实时检测（src/play.py）
 
 ```bash
-python src/play.py --source "$D1_CAMERA_URL"         # 指定视频源 + 自动选权重
+python src/play.py                                  # 默认 RTSP 流 + 自动选权重
 python src/play.py --source video/sample.mp4        # 检测本地视频
 python src/play.py --model train_exp-3              # 按实验名指定权重
 python src/play.py --conf 0.5
@@ -78,12 +78,12 @@ python src/split_dataset.py --include turn_left go_straight --train 0.8 --val 0 
 ### 旧的实时检测脚本（src/d1_yolo.py）
 
 ```bash
-python src/d1_yolo.py --source "$D1_CAMERA_URL"
+cd ~/d1_ws/yolo/yolo/models && python ../src/d1_yolo.py
 ```
 
 注意两点：
-1. 模型路径按脚本位置自动定位到 models/yolov8n.pt，可从任意目录启动。
-2. 使用 --source 或 D1_CAMERA_URL 指定视频源，检测类别为 COCO 的 classes=[0]（person）。新代码请优先使用 src/play.py。
+1. 脚本内模型路径是相对路径 `'yolov8n.pt'`，必须从 `models/` 目录启动（否则会尝试联网重新下载权重到当前目录）。
+2. 脚本硬编码了 RTSP 地址 `rtsp://192.168.3.100:8554/test?tcp`，检测类别为 COCO 的 `classes=[0]`（person）。新代码请优先使用 `src/play.py`。
 
 ### 视频抽帧（src/extract_frames.py）
 
@@ -117,7 +117,7 @@ YOLO 格式（归一化 `class x_center y_center w h`），图片为 1920x1080 J
 - 每个 labels 子目录下都有 `classes.txt`（5 个类别名，顺序与上表一致）：labelImg 的 YOLO 模式靠它读类别名，缺少会崩溃；Ultralytics 训练会忽略该文件，类别号以 `dataset.yaml` 的 `names` 为准。`split_dataset.py` 划分时会自动同步该文件
 - ⚠️ labelImg 保存时会按它记录的类别表重写 classes.txt，标注后若发现该文件被改动需立即恢复，否则 id↔名称映射会错乱
 
-dataset.yaml 不设置固定 path，Ultralytics 按 YAML 所在目录解析数据集根目录。
+`dataset.yaml` 中 `path` 为绝对路径 `/home/ubuntu20/d1_ws/yolo/yolo/datasets/my_dataset`，迁移工作区后需同步修改。
 
 注意：Git 仓库不包含数据集图片（`datasets/my_dataset/images/`）和 `video/`（太大，见根目录 `.gitignore`），labels 和 dataset.yaml 正常入库；图片/视频通过网盘或 GitHub Release 另行分享。
 

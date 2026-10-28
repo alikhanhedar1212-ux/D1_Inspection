@@ -1,5 +1,3 @@
-> 迁移说明：视频源请通过 --source 或环境变量 D1_CAMERA_URL 指定，不再默认连接原设备 IP。模型默认路径按脚本位置解析，数据集根目录按 dataset.yaml 所在目录解析。下面出现的 RTSP 地址仅为原设备示例。
-
 # YOLO 视觉检测工作区
 
 基于 Ultralytics YOLOv8 的目标检测工作区：从 RTSP 摄像头流（Unitree Go2）采集视频 → 抽帧制作数据集 → 训练自定义模型 → 实时检测。共 5 个类别：**turn_left（0）、turn_right（1）、turn_round（2）、go_straight（3）、extinguisher（4）**，类别号与图片文件名前缀一一对应。

@@ -159,10 +159,10 @@
   "src/voice_navigation/voice_relocalizer.py": "85c882e4951a624cbe0fc866e8c2ded661e8ebf74677993f6b88438a145f2d49",
   "src/voice_navigation/wake.py": "3524ee12c4707441d19558834c9f1d4a670e372f17516b688821661756dbf4f3",
   "tests/test_deployment.py": "db699f8852aa1a412f2d87d95973cfcf082587dcd6213da19d61f56822457e1c",
-  "yolo/AGENTS.md": "e4ebd38ae57be8fd65e818bb69887fb0d531a50c7cc1dc6dca3ba68773653446",
-  "yolo/README.md": "063a04d75f1e01f70020d719ba7d77b3e51a72156bdf81f1f78b005a70d2d71c",
-  "yolo/datasets/my_dataset/dataset.yaml": "73cd307b7724f1a63c4225d44adc037fd90b0fe63bf88d4facb74fa047a0494a",
-  "yolo/src/d1_yolo.py": "fab4565e04dbc350c5225753f74bba9c027719b3d9eab4107d17a96ffa880c21",
-  "yolo/src/play.py": "e5e59422dc209347f6d26202c42729b663e9a15fa3f55eb17b305e78f657272b",
-  "yolo/src/train.py": "c206d1976499d44ccc23683236305bee9971be3a2ec2f82516071f67c274d371"
+  "yolo/AGENTS.md": "5b5ea487a49811c8adaa893bdb243797b5b80fc2c2a324bdb138a35eeda6bffe",
+  "yolo/README.md": "a442364163650e24a50c324bd3582c398b2b173f80489aa24b3458c90a622512",
+  "yolo/datasets/my_dataset/dataset.yaml": "ca9879f9be9b3679061a1ac1589e81c7c35e9dd463e8bc8f1e73450df3a2878f",
+  "yolo/src/d1_yolo.py": "fd98f317bfa91ae713009fb5d610ceea67a09a337d06ac978213a99864135eaa",
+  "yolo/src/play.py": "82eb192a135a8712be0ac3866da625db0cdbcf4a6e7f76716e56ccf55f863402",
+  "yolo/src/train.py": "dcb4dacdcd739d779265cfd4f24a68e56293483a622ff050b48cb31218b3c2e8"
 }
