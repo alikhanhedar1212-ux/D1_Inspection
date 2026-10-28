@@ -1,27 +1,27 @@
 # 机器狗语音巡检与实时文字 UI
 
-代码按所在目录自动定位资源，可克隆到任意目录，无需修改源码中的用户名或本机路径。远端 SSH、部署目录和音频设备统一配置在 `drivers/config/config.local.json`。
+代码按所在目录自动定位资源，可克隆到任意目录，无需修改源码中的用户名或本机路径。远端 SSH、部署目录和音频设备统一配置在 `src/drivers/config/config.local.json`。
 
 ## 目录结构
 
 ```text
 D1_Inspection/
-├── yolo/                     # 现有视觉模块，本次整理未修改
-├── drivers/                  # 设备驱动、传感器和底层控制接口
-│   └── config/               # SSH、设备、ROS、DDS 参数
-├── maps/                     # 地图图像、地图 YAML、六点与巡检点位
-├── UI/                       # 转写页面、HTTP 服务
-│   └── rviz/                 # RViz 显示配置
-├── navigation_localization/  # 定位、规划、控制桥和启动器
-│   └── behavior_trees/       # 导航行为树 XML
-├── voice_navigation/         # 语音识别、巡检流程和音频
-├── tests/                    # 项目迁移和目录引用测试
-├── deployment.py             # 统一路径与设备配置读取
-├── doctor.py                 # 依赖和资源检查
+├── yolo/                         # 现有视觉模块，保持不变
+├── UI/                           # 网页、HTTP 服务及 RViz 显示配置
+├── maps/                         # 地图、语音点位、巡检点位
+├── src/
+│   ├── drivers/                  # 设备驱动和配置
+│   │   └── config/               # SSH、设备、ROS、DDS 参数
+│   ├── navigation_localization/  # 定位、规划、控制桥和启动器
+│   │   └── behavior_trees/       # 导航行为树 XML
+│   ├── voice_navigation/         # 语音识别和巡检流程
+│   └── tests/                    # 项目迁移和目录引用测试
+├── deployment.py                 # 统一路径与设备配置读取
+├── doctor.py                     # 依赖和资源检查
 └── requirements.txt
 ```
 
-驱动配置只需在 `drivers/config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `UI/`。各目录的 README 说明了入口和用途。
+驱动配置只需在 `src/drivers/config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `UI/`。各目录的 README 说明了入口和用途。
 
 ## 当前功能
 
@@ -40,12 +40,12 @@ python3 doctor.py
 python3 UI/voice_dashboard.py
 ```
 
-电脑访问 `http://127.0.0.1:8091/`，局域网设备访问 `http://电脑局域网IP:8091/`。网页读取识别进程生成的 `voice_navigation/ui_events.jsonl`，不会自行启动麦克风或发送运动命令。只允许本机访问可加 `--host 127.0.0.1`。
+电脑访问 `http://127.0.0.1:8091/`，局域网设备访问 `http://电脑局域网IP:8091/`。网页读取识别进程生成的 `src/voice_navigation/ui_events.jsonl`，不会自行启动麦克风或发送运动命令。只允许本机访问可加 `--host 127.0.0.1`。
 
 ## 配置设备
 
 ```bash
-cp drivers/config/config.example.json drivers/config/config.local.json
+cp src/drivers/config/config.example.json src/drivers/config/config.local.json
 ```
 
 在电脑、AidLux 和 Firefly 上部署同一份源码。远端默认目录为各自登录用户的 `~/D1_Inspection`；如果改了目录名或放到其他位置，在电脑的配置中修改 `aidlux_root` / `firefly_root`。路径可以包含空格，`~` 在远端展开。远端设备自己的配置也需设置本机所用 ROS 环境和音频设备。
@@ -57,23 +57,23 @@ cp drivers/config/config.example.json drivers/config/config.local.json
 - `firefly_workspace_setup`：Firefly 厂商驱动 setup 文件。
 - `microphone` / `speaker`：PulseAudio 设备名，分别用 `pactl list short sources` / `pactl list short sinks` 查询。本机收音可用 `--source` 明确指定输入。
 - `camera_device`：AidLux 摄像头设备，默认 `/dev/video2`。
-- `mapping_config`：AidLux 的 FAST-LIO 模板，默认相对于其仓库根目录的 `drivers/config/lio.template.yaml`。示例保留原设备雷达外参，换设备需要校准。
+- `mapping_config`：AidLux 的 FAST-LIO 模板，默认相对于其仓库根目录的 `src/drivers/config/lio.template.yaml`。示例保留原设备雷达外参，换设备需要校准。
 - 远端 ROS 域默认 AidLux 为 0、Firefly 为 24；本机导航域为 93。
 
 已有设备目录结构不同，也可设置 `aidlux_drivers_dir`、`aidlux_voice_navigation_dir`、`firefly_drivers_dir`、`firefly_voice_navigation_dir`，分别覆盖远端模块目录。
 
-`drivers/config/config.local.json` 已被 Git 忽略。可用 `D1_CONFIG` 指定其他 JSON 配置文件；该环境变量只对设置它的机器生效，不会自动复制到远端。
+`src/drivers/config/config.local.json` 已被 Git 忽略。可用 `D1_CONFIG` 指定其他 JSON 配置文件；该环境变量只对设置它的机器生效，不会自动复制到远端。
 
 ## 安装本机依赖
 
-需要 Ubuntu、Python 3.10+、ROS 2 Humble、Nav2、Cyclone DDS、RotationShimController、STVL，以及 PulseAudio 命令行工具。厂商驱动和对应 ROS 消息需在设备上安装。支持系统安装的 DDS/STVL，也兼容放在 `navigation_localization/vendor/` 下的原有运行库；vendor 二进制不入库。
+需要 Ubuntu、Python 3.10+、ROS 2 Humble、Nav2、Cyclone DDS、RotationShimController、STVL，以及 PulseAudio 命令行工具。厂商驱动和对应 ROS 消息需在设备上安装。支持系统安装的 DDS/STVL，也兼容放在 `src/navigation_localization/vendor/` 下的原有运行库；vendor 二进制不入库。
 
 ```bash
-python3 -m venv --system-site-packages voice_navigation/.venv
-voice_navigation/.venv/bin/python -m pip install -r requirements.txt
-source navigation_localization/runtime_env.sh
-cmake -S navigation_localization/terminal_replan -B navigation_localization/terminal_replan/build
-cmake --build navigation_localization/terminal_replan/build -j2
+python3 -m venv --system-site-packages src/voice_navigation/.venv
+src/voice_navigation/.venv/bin/python -m pip install -r requirements.txt
+source src/navigation_localization/runtime_env.sh
+cmake -S src/navigation_localization/terminal_replan -B src/navigation_localization/terminal_replan/build
+cmake --build src/navigation_localization/terminal_replan/build -j2
 ```
 
 在远端也需安装其脚本所用依赖。AidLux 摄像头需要 OpenCV，播放需要 `paplay`，录音需要 `parec` 和 `ffmpeg`。Firefly 速度接收端需要厂商消息包和 Zenoh ROS 中间件。
@@ -82,14 +82,14 @@ cmake --build navigation_localization/terminal_replan/build -j2
 
 仓库不包含个人语音录音、语音模型、降噪数据和厂商二进制。部署前需要自行准备：
 
-- Vosk 中文模型解压至 `voice_navigation/models/vosk-model-small-cn-0.22/`。
-- 纽曼麦克风校准文件 `voice_navigation/newmine_noise_profile.npz`；远端收音使用 `newmine_noise_profile_remote.npz`。这些文件是校准数据，不能用空文件替代。
-- 回复 WAV 放入本机及 AidLux 的 `voice_navigation/audio/`，包含 `wake_reply.wav`、`okay.wav` 和巡检的 `device_normal.wav`、`device_missing.wav`、`camera_error.wav`、`planning_error.wav`、`sign_error.wav`。其他可选语音功能所需文件见模块说明。
-- 电量查询和打招呼为可选功能，需要在 Firefly 用对应架构的 eCAL/厂商 SDK 编译 `read_battery_native.cpp`、`greet_native.cpp`，将可执行文件放到其 `voice_navigation/` 下。
+- Vosk 中文模型解压至 `src/voice_navigation/models/vosk-model-small-cn-0.22/`。
+- 纽曼麦克风校准文件 `src/voice_navigation/newmine_noise_profile.npz`；远端收音使用 `newmine_noise_profile_remote.npz`。这些文件是校准数据，不能用空文件替代。
+- 回复 WAV 放入本机及 AidLux 的 `src/voice_navigation/audio/`，包含 `wake_reply.wav`、`okay.wav` 和巡检的 `device_normal.wav`、`device_missing.wav`、`camera_error.wav`、`planning_error.wav`、`sign_error.wav`。其他可选语音功能所需文件见模块说明。
+- 电量查询和打招呼为可选功能，需要在 Firefly 用对应架构的 eCAL/厂商 SDK 编译 `read_battery_native.cpp`、`greet_native.cpp`，将可执行文件放到其 `src/drivers/` 下。
 
 ```bash
-source navigation_localization/runtime_env.sh
-voice_navigation/.venv/bin/python doctor.py --robot
+source src/navigation_localization/runtime_env.sh
+src/voice_navigation/.venv/bin/python doctor.py --robot
 ```
 
 检查只报告本机缺失项，不连接或驱动机器人。它不代替远端驱动、ROS 插件或现场地图校准验收。
@@ -99,26 +99,26 @@ voice_navigation/.venv/bin/python doctor.py --robot
 1. 在 AidLux 的仓库内执行，启动传感器输入：
 
    ```bash
-   python3 drivers/start_remote_inputs.py
+   python3 src/drivers/start_remote_inputs.py
    ```
 
 2. 在电脑的仓库内执行，打开定位、规划、摄像头和 RViz：
 
    ```bash
-   python3 navigation_localization/restore_planning_only.py
+   python3 src/navigation_localization/restore_planning_only.py
    ```
 
 3. 核对现场地图、机身朝向和点位后，在电脑另开终端连接速度桥：
 
    ```bash
-   source navigation_localization/runtime_env.sh
-   python3 navigation_localization/velocity_bridge.py
+   source src/navigation_localization/runtime_env.sh
+   python3 src/navigation_localization/velocity_bridge.py
    ```
 
 4. 在电脑启动语音，首次可先不加 `--execute` 验证识别；需要实机执行时使用：
 
    ```bash
-   bash voice_navigation/run_computer_mic.sh --execute
+   bash src/voice_navigation/run_computer_mic.sh --execute
    ```
 
 5. 用前文的命令启动网页查看转写。
@@ -129,18 +129,18 @@ voice_navigation/.venv/bin/python doctor.py --robot
 
 ## 源码与验证
 
-- `drivers/`：设备侧程序、摄像头传输及集中配置。
+- `src/drivers/`：设备侧程序、摄像头传输及集中配置。
 - `maps/`：地图、六个语音点与 P1～P4 巡检配置。
 - `UI/`：网页服务、HTML 和 RViz 配置。
-- `voice_navigation/`：语音与巡检流程。
-- `navigation_localization/`：定位、规划、行为树和速度桥。
+- `src/voice_navigation/`：语音与巡检流程。
+- `src/navigation_localization/`：定位、规划、行为树和速度桥。
 - `yolo/`：已有视觉检测及训练模块，视频源通过 `--source` 或 `D1_CAMERA_URL` 指定，未自动接入巡检。
 - `deployment.py`：集中配置、远端路径及 SSH 命令构造。
 - `SOURCE_MANIFEST.json`：所列源码文件的 SHA256；后续修改源码后需更新。
 
 ```bash
-voice_navigation/.venv/bin/python -m unittest discover -s tests -v
-voice_navigation/.venv/bin/python -m unittest discover -s voice_navigation -q
+src/voice_navigation/.venv/bin/python -m unittest discover -s tests -v
+src/voice_navigation/.venv/bin/python -m unittest discover -s voice_navigation -q
 python3 -m unittest discover -s UI -v
 ```
 

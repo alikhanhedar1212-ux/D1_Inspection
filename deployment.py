@@ -18,12 +18,12 @@ DEFAULTS = {
     'microphone': 'alsa_input.usb-Newmine_Newmine_20180508-00.analog-stereo',
     'speaker': 'alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo',
     'camera_device': '/dev/video2',
-    'mapping_config': 'drivers/config/lio.template.yaml',
+    'mapping_config': 'src/drivers/config/lio.template.yaml',
 }
 
 
 def load_settings():
-    path = Path(os.environ.get('D1_CONFIG', ROOT / 'drivers/config/config.local.json')).expanduser()
+    path = Path(os.environ.get('D1_CONFIG', ROOT / 'src/drivers/config/config.local.json')).expanduser()
     settings = dict(DEFAULTS)
     if path.is_file():
         overrides = json.loads(path.read_text())
@@ -41,7 +41,7 @@ def setting(name):
 
 
 def config_path(name):
-    return ROOT / 'drivers' / 'config' / name
+    return ROOT / 'src' / 'drivers' / 'config' / name
 
 
 def map_path(name):
@@ -53,7 +53,7 @@ def ui_path(name):
 
 
 def behavior_path(name):
-    return ROOT / 'navigation_localization' / 'behavior_trees' / name
+    return ROOT / 'src' / 'navigation_localization' / 'behavior_trees' / name
 
 
 def local_path(value):
@@ -65,7 +65,7 @@ def remote_file(role, area, filename=''):
     # Optional per-area overrides support existing installations as well as clones.
     directory = SETTINGS.get(f'{role}_{area}_dir')
     if not directory:
-        directory = str(PurePosixPath(setting(f'{role}_root')) / area)
+        directory = str(PurePosixPath(setting(f'{role}_root')) / 'src' / area)
     return str(PurePosixPath(directory) / filename)
 
 

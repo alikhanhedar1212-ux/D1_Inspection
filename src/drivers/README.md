@@ -12,7 +12,7 @@
 配置入口：
 
 ```bash
-cp drivers/config/config.example.json drivers/config/config.local.json
+cp src/drivers/config/config.example.json src/drivers/config/config.local.json
 ```
 
 默认从此配置读取 SSH、远端部署路径、ROS 工作区、音频设备和摄像头设备。导航用的 AMCL、规划器、控制器参数也集中在 `config/`；地图与点位在仓库的 `maps/`，页面与 RViz 配置在 `UI/`。

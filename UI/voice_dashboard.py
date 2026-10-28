@@ -7,7 +7,7 @@ import argparse
 import time
 
 UI_ROOT = Path(__file__).resolve().parent
-ROOT = UI_ROOT.parent / 'voice_navigation'
+ROOT = UI_ROOT.parent / 'src' / 'voice_navigation'
 
 
 def snapshot():

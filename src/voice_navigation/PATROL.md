@@ -42,7 +42,7 @@ P4 连续3帧确认一种路标。直行：自主规划回本轮起点。左/右
 
 语音：bash run_computer_mic.sh --execute，默认唯一纽曼USB麦克风并启用已有降噪；缺失时拒绝回退到内置麦克风。页面http://127.0.0.1:8091/显示巡检阶段和结果。
 
-运行记录：navigation_localization/patrol_path_validation.json（只计算路径，不含实走），patrol_live_preflight.json（实时图像与状态，只读），voice_navigation/patrol_audio_manifest.json（音频校验）。
+运行记录：src/navigation_localization/patrol_path_validation.json（只计算路径，不含实走），patrol_live_preflight.json（实时图像与状态，只读），src/voice_navigation/patrol_audio_manifest.json（音频校验）。
 
 
 2026-10-26 洗手间地图更新：原先手工矩形扩展已由同次3D雷达扫描保存的原始射线投影替换，恢复真实通道边界及未知区；不再假设矩形全部可通行。详见navigation_localization/washroom_restore_report.json。P2校准值保留。

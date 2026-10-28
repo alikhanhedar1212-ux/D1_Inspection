@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Source this file from any working directory. System ROS packages are supported.
 NAV_RUNTIME_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-NAV_ROS_SETUP="${D1_ROS_SETUP:-$(python3 "$NAV_RUNTIME_ROOT/../deployment.py" --get ros_setup)}"
+NAV_ROS_SETUP="${D1_ROS_SETUP:-$(python3 "$NAV_RUNTIME_ROOT/../../deployment.py" --get ros_setup)}"
 NAV_ROS_SETUP="${NAV_ROS_SETUP/#\~/$HOME}"
 if [[ ! -f "$NAV_ROS_SETUP" ]]; then
     echo "ROS setup not found: $NAV_ROS_SETUP (set D1_ROS_SETUP)" >&2

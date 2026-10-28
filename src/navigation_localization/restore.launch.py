@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from deployment import motion_parameters, config_path, map_path
 import os

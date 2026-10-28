@@ -3,8 +3,8 @@ from project_config import remote_file, setting, ssh_command
 import json,os,signal,subprocess,time
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parent.parent
-NAV=ROOT/'navigation_localization'
+ROOT=Path(__file__).resolve().parents[2]
+NAV=ROOT/'src/navigation_localization'
 SELF=Path(__file__).resolve()
 
 def processes():

@@ -12,7 +12,7 @@ class TransportTests(unittest.TestCase):
     def test_remote_uses_existing_device_and_script(self):
         cmd = capture_command(False, REMOTE_SOURCE)
         self.assertEqual(cmd[0], 'ssh')
-        self.assertIn('D1_Inspection/voice_navigation/audio_sender.py', cmd[-1])
+        self.assertIn('D1_Inspection/src/voice_navigation/audio_sender.py', cmd[-1])
         self.assertIn(REMOTE_SOURCE, cmd[-1])
 
     def test_computer_mic_and_robot_reply_are_independent(self):
@@ -20,8 +20,8 @@ class TransportTests(unittest.TestCase):
         reply = playback_command(False, Path('/audio'), 'im_here.wav')
         self.assertEqual(reply[0], 'ssh')
         self.assertIn('aidlux', reply)
-        self.assertIn('D1_Inspection/voice_navigation/play_reply.py', reply[-1])
-        self.assertIn('D1_Inspection/voice_navigation/audio/im_here.wav', reply[-1])
+        self.assertIn('D1_Inspection/src/voice_navigation/play_reply.py', reply[-1])
+        self.assertIn('D1_Inspection/src/voice_navigation/audio/im_here.wav', reply[-1])
 
 
 if __name__ == '__main__':

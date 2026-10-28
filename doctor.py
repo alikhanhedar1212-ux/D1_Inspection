@@ -18,11 +18,11 @@ def main():
                    for module in ('yaml', 'numpy', 'cv2', 'vosk', 'rclpy', 'nav2_msgs')]
         checks += [(name, shutil.which(name) is not None) for name in ('ssh', 'pactl', 'parec', 'paplay', 'ros2', 'rviz2')]
         checks += [('ROS setup', local_path(setting('ros_setup')).is_file()),
-                   ('Vosk model', (ROOT/'voice_navigation/models/vosk-model-small-cn-0.22/am/final.mdl').is_file()),
-                   ('behavior tree plugin', (ROOT/'navigation_localization/terminal_replan/build/libterminal_replan_bt_node.so').is_file())]
+                   ('Vosk model', (ROOT/'src/voice_navigation/models/vosk-model-small-cn-0.22/am/final.mdl').is_file()),
+                   ('behavior tree plugin', (ROOT/'src/navigation_localization/terminal_replan/build/libterminal_replan_bt_node.so').is_file())]
         for name in ('wake_reply', 'okay', 'device_normal', 'device_missing', 'camera_error', 'planning_error', 'sign_error'):
-            checks.append((f'audio/{name}.wav', (ROOT/f'voice_navigation/audio/{name}.wav').is_file()))
-        checks.append(('Newmine noise profile', (ROOT/'voice_navigation/newmine_noise_profile.npz').is_file()))
+            checks.append((f'audio/{name}.wav', (ROOT/f'src/voice_navigation/audio/{name}.wav').is_file()))
+        checks.append(('Newmine noise profile', (ROOT/'src/voice_navigation/newmine_noise_profile.npz').is_file()))
     for name, success in checks:
         print(f'{"OK" if success else "MISSING"}: {name}')
     if args.robot:

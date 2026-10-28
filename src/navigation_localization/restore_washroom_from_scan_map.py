@@ -14,7 +14,7 @@ import yaml
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parent
-SOURCE = ROOT.parent / 'offline_2d_20261009'
+SOURCE = ROOT.parent.parent / 'offline_2d_20261009'
 BOUNDS = {'x': [-20.2, -16.2], 'y': [-4.6, 3.3]}
 
 
