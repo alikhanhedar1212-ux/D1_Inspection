@@ -15,7 +15,7 @@
 
 启动页面服务（监听程序需单独启动）：
 ```bash
-python3 ./ui/voice_dashboard.py
+python3 ./UI/voice_dashboard.py
 ```
 页面默认监听所有 IPv4 网卡，同一局域网内可通过 `http://电脑局域网IP:8091/` 访问；本机仍可使用上述地址。若需仅限本机，启动时加 `--host 127.0.0.1`。识别事件保存在本地 `ui_events.jsonl`，无外部字体、脚本或网络依赖。“清空显示”只清空当前页面记录，不删除文件。
 

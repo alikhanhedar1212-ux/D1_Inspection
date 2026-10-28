@@ -8,7 +8,7 @@
 在仓库根目录启动：
 
 ```bash
-python3 ui/voice_dashboard.py
+python3 UI/voice_dashboard.py
 ```
 
 默认监听 `0.0.0.0:8091`。本机访问 `http://127.0.0.1:8091/`，同一局域网使用电脑 IP。只限本机时加 `--host 127.0.0.1`。

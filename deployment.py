@@ -49,7 +49,7 @@ def map_path(name):
 
 
 def ui_path(name):
-    return ROOT / 'ui' / name
+    return ROOT / 'UI' / name
 
 
 def behavior_path(name):

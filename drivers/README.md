@@ -15,6 +15,6 @@
 cp drivers/config/config.example.json drivers/config/config.local.json
 ```
 
-默认从此配置读取 SSH、远端部署路径、ROS 工作区、音频设备和摄像头设备。导航用的 AMCL、规划器、控制器参数也集中在 `config/`；地图与点位在仓库的 `maps/`，页面与 RViz 配置在 `ui/`。
+默认从此配置读取 SSH、远端部署路径、ROS 工作区、音频设备和摄像头设备。导航用的 AMCL、规划器、控制器参数也集中在 `config/`；地图与点位在仓库的 `maps/`，页面与 RViz 配置在 `UI/`。
 
 完整依赖与启动顺序见根目录 README。配置路径按项目位置解析，不依赖固定用户名。

@@ -12,7 +12,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--robot', action='store_true', help='Also check local ROS and voice assets')
     args = parser.parse_args()
-    checks = [('dashboard', (ROOT/'ui/dashboard.html').is_file())]
+    checks = [('dashboard', (ROOT/'UI/dashboard.html').is_file())]
     if args.robot:
         checks += [(module, importlib.util.find_spec(module) is not None)
                    for module in ('yaml', 'numpy', 'cv2', 'vosk', 'rclpy', 'nav2_msgs')]

@@ -10,7 +10,7 @@ D1_Inspection/
 ├── drivers/                  # 设备驱动、传感器和底层控制接口
 │   └── config/               # SSH、设备、ROS、DDS 参数
 ├── maps/                     # 地图图像、地图 YAML、六点与巡检点位
-├── ui/                       # 转写页面、HTTP 服务
+├── UI/                       # 转写页面、HTTP 服务
 │   └── rviz/                 # RViz 显示配置
 ├── navigation_localization/  # 定位、规划、控制桥和启动器
 │   └── behavior_trees/       # 导航行为树 XML
@@ -21,7 +21,7 @@ D1_Inspection/
 └── requirements.txt
 ```
 
-驱动配置只需在 `drivers/config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `ui/`。各目录的 README 说明了入口和用途。
+驱动配置只需在 `drivers/config/` 查找，换地图和点位到 `maps/`，修改网页或 RViz 到 `UI/`。各目录的 README 说明了入口和用途。
 
 ## 当前功能
 
@@ -37,7 +37,7 @@ D1_Inspection/
 
 ```bash
 python3 doctor.py
-python3 ui/voice_dashboard.py
+python3 UI/voice_dashboard.py
 ```
 
 电脑访问 `http://127.0.0.1:8091/`，局域网设备访问 `http://电脑局域网IP:8091/`。网页读取识别进程生成的 `voice_navigation/ui_events.jsonl`，不会自行启动麦克风或发送运动命令。只允许本机访问可加 `--host 127.0.0.1`。
@@ -131,7 +131,7 @@ voice_navigation/.venv/bin/python doctor.py --robot
 
 - `drivers/`：设备侧程序、摄像头传输及集中配置。
 - `maps/`：地图、六个语音点与 P1～P4 巡检配置。
-- `ui/`：网页服务、HTML 和 RViz 配置。
+- `UI/`：网页服务、HTML 和 RViz 配置。
 - `voice_navigation/`：语音与巡检流程。
 - `navigation_localization/`：定位、规划、行为树和速度桥。
 - `yolo/`：已有视觉检测及训练模块，视频源通过 `--source` 或 `D1_CAMERA_URL` 指定，未自动接入巡检。
@@ -141,7 +141,7 @@ voice_navigation/.venv/bin/python doctor.py --robot
 ```bash
 voice_navigation/.venv/bin/python -m unittest discover -s tests -v
 voice_navigation/.venv/bin/python -m unittest discover -s voice_navigation -q
-python3 -m unittest discover -s ui -v
+python3 -m unittest discover -s UI -v
 ```
 
 迁移测试覆盖重命名目录、含空格路径、远端 home 展开与参数转义。可选楼梯几何测试在未提供楼梯地图时跳过。这些离线检查不触发实机运动。
