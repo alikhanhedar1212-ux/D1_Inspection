@@ -4,6 +4,7 @@ import math
 import os
 import signal
 import subprocess
+import shlex
 import time
 from pathlib import Path
 import rclpy
@@ -17,7 +18,7 @@ env = dict(os.environ,ROS_DOMAIN_ID='93',ROS_LOCALHOST_ONLY='1',RMW_IMPLEMENTATI
 old = Path(f'/proc/{processes["stream_receiver"]}/cmdline')
 if not old.exists() or not old.read_bytes():
     with (root/'runtime_logs/stream_receiver.log').open('ab') as log:
-        process = subprocess.Popen(['bash','-c',f'source /home/hcb/aidlux_mapping_view/navigation_localization/runtime_env.sh; exec python3 -u {root}/stream_receiver.py'],
+        process = subprocess.Popen(['bash','-c',f'source {shlex.quote(str(root / "runtime_env.sh"))} && exec python3 -u {shlex.quote(str(root / "stream_receiver.py"))}'],
                                    env=env,stdin=subprocess.DEVNULL,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
     processes['stream_receiver']=process.pid;state.write_text(json.dumps(processes,indent=2))
 rclpy.init(); n = rclpy.create_node('voxel_reload_guard')
@@ -52,11 +53,11 @@ for name, token in [('navigation','restore.launch.py'),('stream_receiver','strea
     while cmd.exists() and cmd.read_bytes() and time.monotonic()<end: time.sleep(.1)
     assert not cmd.exists() or not cmd.read_bytes(), f'{name} failed to exit'
 env = dict(os.environ,ROS_DOMAIN_ID='93',ROS_LOCALHOST_ONLY='1',RMW_IMPLEMENTATION='rmw_cyclonedds_cpp')
-commands = {'stream_receiver':f'python3 -u {root}/stream_receiver.py',
-            'navigation':f'ros2 launch {root}/restore.launch.py'}
+commands = {'stream_receiver':shlex.join(['python3','-u',str(root/'stream_receiver.py')]),
+            'navigation':shlex.join(['ros2','launch',str(root/'restore.launch.py')])}
 for name, command in commands.items():
     with (root/'runtime_logs'/f'{name}.log').open('ab') as log:
-        process = subprocess.Popen(['bash','-c','source /home/hcb/aidlux_mapping_view/navigation_localization/runtime_env.sh; exec '+command],
+        process = subprocess.Popen(['bash','-c',f'source {shlex.quote(str(root / "runtime_env.sh"))} && exec '+command],
                                    env=env,stdin=subprocess.DEVNULL,stdout=log,
                                    stderr=subprocess.STDOUT,start_new_session=True)
         processes[name]=process.pid

@@ -1,4 +1,5 @@
 """Stop this project's navigation experiment, preserving robot core services and maps."""
+from project_config import remote_file, setting, ssh_command
 import json,os,signal,subprocess,time
 from pathlib import Path
 
@@ -57,7 +58,9 @@ for pid,(_,args) in ps.items():
         if any('/navigation_localization/' in a or '/voice_navigation/' in a or '/stairs_mapping/' in a or a==str(ROOT/'camera_receiver.py') for a in project_scripts):roots.add(pid)
     if Path(args[0]).name=='rviz2' and any(a.startswith(str(ROOT)+'/') and a.endswith('.rviz') for a in args):roots.add(pid)
     if args[0].startswith(str(ROOT/'stairs_mapping/jie_3d_ws/install')+'/'):roots.add(pid)
-    if Path(args[0]).name=='ssh' and any('/home/firefly/rviz_navigation/velocity_receiver.py' in a or '/home/aidlux/navigation_preview/stream_sender.py' in a or '/home/aidlux/navigation_preview/clock_probe.py' in a or '/home/aidlux/mapping_test/camera_sender' in a for a in args):roots.add(pid)
+    if (Path(args[0]).name=='ssh' and any(setting(role+'_host') in args for role in ('aidlux','firefly'))
+            and any(token in a for token in ('velocity_receiver.py','stream_sender.py','clock_probe.py','camera_sender_latest.py') for a in args)):
+        roots.add(pid)
 targets=set(roots)
 while True:
     children={p for p,(parent,args) in ps.items() if parent in targets}
@@ -74,6 +77,9 @@ record['local_stopped']=[{'pid':p,'args':ps[p][1]} for p in sorted(targets)]
 remote=r'''import os,signal,time,json
 from pathlib import Path
 HOST=__HOST__
+NAVDIR=str(Path(__NAVDIR__).expanduser().resolve())
+VOICEDIR=str(Path(__VOICEDIR__).expanduser().resolve())
+CAMERA=str(Path(__CAMERA__).expanduser().resolve())
 def scan():
  out={}
  for p in Path('/proc').glob('[0-9]*'):
@@ -86,15 +92,15 @@ ps=scan();targets=set()
 for pid,(parent,args) in ps.items():
  if pid==os.getpid() or not args:continue
  if HOST=='aidlux':
-  match=any(a.startswith('/home/aidlux/navigation_preview/') or a.startswith('/home/aidlux/stairs_realtime/') for a in args[1:] if a.endswith('.py'))
-  match=match or any(a in ('/home/aidlux/mapping_test/camera_sender.py','/home/aidlux/mapping_test/camera_sender_latest.py','/home/aidlux/voice_navigation/audio_sender.py','/home/aidlux/voice_navigation/play_reply.py') for a in args[1:])
- else:match='/home/firefly/rviz_navigation/velocity_receiver.py' in args
+  match=any(a.startswith(NAVDIR+'/') for a in args[1:] if a.endswith('.py'))
+  match=match or any(a in (CAMERA,VOICEDIR+'/audio_sender.py',VOICEDIR+'/play_reply.py') for a in args[1:])
+ else:match=NAVDIR+'/velocity_receiver.py' in args
  if match:targets.add(pid)
 if HOST=='aidlux':
- for state in (Path('/home/aidlux/navigation_preview/processes.json'),Path('/home/aidlux/stairs_realtime/processes.json')):
+ for state in (Path(NAVDIR)/'processes.json',):
   if state.exists():
    for pid in json.loads(state.read_text()).values():
-    if pid in ps and any('pacecat_m300_driver' in a or 'fast_lio' in a or '/navigation_preview/' in a or '/stairs_realtime/' in a for a in ps[pid][1]):targets.add(pid)
+    if pid in ps and any('pacecat_m300_driver' in a or 'fast_lio' in a or NAVDIR+'/' in a for a in ps[pid][1]):targets.add(pid)
 while True:
  children={p for p,(parent,args) in ps.items() if parent in targets}
  if children<=targets:break
@@ -113,14 +119,18 @@ for pid in targets:
   if current==ps.get(pid) and current[1]:os.kill(pid,signal.SIGKILL)
  except ProcessLookupError:pass
 if HOST=='aidlux':
- for state in (Path('/home/aidlux/navigation_preview/processes.json'),Path('/home/aidlux/stairs_realtime/processes.json')):
+ for state in (Path(NAVDIR)/'processes.json',):
   if state.exists():state.write_text('{}\n')
 print(json.dumps({'host':HOST,'stopped':[{'pid':p,'args':ps[p][1]} for p in sorted(targets)]}))
 '''
 record['remote']=[]
 for host in ('aidlux','firefly'):
     try:
-        result=subprocess.run(['ssh','-T','-o','BatchMode=yes','-o','ConnectTimeout=5',host,'python3','-'],input=remote.replace('__HOST__',repr(host)),capture_output=True,text=True,timeout=15)
+        code=(remote.replace('__HOST__',repr(host))
+              .replace('__NAVDIR__',repr(remote_file(host,'navigation_localization')))
+              .replace('__VOICEDIR__',repr(remote_file(host,'voice_navigation')))
+              .replace('__CAMERA__',repr(remote_file(host,'','camera_sender_latest.py'))))
+        result=subprocess.run(ssh_command(host,['python3','-'],timeout=5),input=code,capture_output=True,text=True,timeout=15)
         record['remote'].append({'host':host,'returncode':result.returncode,'output':result.stdout,'error':result.stderr})
     except subprocess.TimeoutExpired:record['remote'].append({'host':host,'timeout':True})
 state=NAV/'restored_processes.json'

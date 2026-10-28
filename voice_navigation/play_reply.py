@@ -1,9 +1,10 @@
 """AidLux reply playback: reapply the user's 40% volume for every utterance."""
+from project_config import setting
 from pathlib import Path
 import subprocess
 import sys
 
-SINK='alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo'
+SINK=setting('speaker')
 AUDIO=Path(__file__).resolve().parent/'audio'
 
 def play(path,runner=subprocess.run):

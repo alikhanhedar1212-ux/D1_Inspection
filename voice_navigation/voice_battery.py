@@ -1,4 +1,5 @@
 """Read-only, cancellable native battery query with a robot-side spoken reply."""
+from project_config import remote_file, ssh_command
 import json
 from pathlib import Path
 import threading
@@ -24,9 +25,7 @@ class VoiceBatteryQuery(VoiceRelocalizer):
             self.report(event='battery_query_started')
             try:
                 started = time.monotonic()
-                command = ['ssh', '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
-                           '-o', 'ServerAliveInterval=2', '-o', 'ServerAliveCountMax=2',
-                           'firefly', '/home/firefly/rviz_navigation/read_battery_native']
+                command = ssh_command('firefly', [remote_file('firefly', 'voice_navigation', 'read_battery_native')], timeout=5)
                 code, stdout, stderr = self._run_command(command, 12, cancelled)
                 if code:
                     raise RuntimeError(stderr.strip() or '未收到实时电池数据')
@@ -58,9 +57,7 @@ class VoiceBatteryQuery(VoiceRelocalizer):
             self.speaking = True
             self.recognition_epoch += 1
             try:
-                command = ['ssh', '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
-                           'aidlux', 'python3', '/home/aidlux/voice_navigation/battery_reply.py',
-                           str(percent) if success else 'unavailable']
+                command = ssh_command('aidlux', ['python3', remote_file('aidlux', 'voice_navigation', 'battery_reply.py'), str(percent) if success else 'unavailable'], timeout=5)
                 code, _, stderr = self._run_command(command, 20, cancelled)
                 if code:
                     raise RuntimeError(stderr.strip() or '电量播报失败')

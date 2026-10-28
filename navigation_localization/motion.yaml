@@ -196,5 +196,5 @@ bt_navigator:
     - nav2_drive_on_heading_cancel_bt_node
     - nav2_is_battery_charging_condition_bt_node
     transform_tolerance: 0.5
-    default_nav_to_pose_bt_xml: /home/hcb/aidlux_mapping_view/navigation_localization/navigate_arrival_v2.xml
-    default_nav_through_poses_bt_xml: /home/hcb/aidlux_mapping_view/navigation_localization/navigate_through.xml
+    default_nav_to_pose_bt_xml: navigate_arrival_v2.xml
+    default_nav_through_poses_bt_xml: navigate_through.xml

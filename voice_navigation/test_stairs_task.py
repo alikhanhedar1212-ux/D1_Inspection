@@ -179,6 +179,7 @@ class MissionTests(unittest.TestCase):
         for phrase in ('不要进1号门','进1号门然后出2号门','不确认'):
             self.assertIsNone(parse(phrase))
 
+    @unittest.skipUnless((Path(__file__).parent.parent/'stairs_mapping/maps/dimensioned_reference_preview/geometry.json').is_file(), 'Optional stairs geometry is not included in the patrol repository')
     def test_fixed_point_stays_on_platform_facing_stair(self):
         c=json.loads((Path(__file__).parent/'stairs_task_config.json').read_text())
         p=c['targets']['stairs_platform_center']

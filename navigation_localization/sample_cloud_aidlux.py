@@ -11,7 +11,7 @@ from sensor_msgs.msg import Imu
 from nav_msgs.msg import Odometry
 from pacecat_m300_inter.msg import CustomMsg
 
-root = Path('/home/aidlux/navigation_preview')
+root = Path(__file__).resolve().parent
 tree = ast.parse((root / 'live_inputs.py').read_text())
 imports = [item for item in tree.body if isinstance(item, (ast.Import, ast.ImportFrom))]
 defs = [item for item in tree.body if isinstance(item, ast.FunctionDef) and item.name == 'decode']

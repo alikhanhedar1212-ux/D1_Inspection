@@ -1,4 +1,5 @@
 """Offline voice commands from AidLux USB mic to existing Nav2 action server."""
+from project_config import remote_file, ssh_command, setting
 import argparse
 import json
 import math
@@ -287,13 +288,7 @@ class Navigator:
         try:
             if generation != self.generation:
                 return
-            remote = ('source /opt/ros/humble/setup.bash; '
-                      'source /opt/robot/robot-forward/install/setup.bash; '
-                      'export ROS_DOMAIN_ID=24 RMW_IMPLEMENTATION=rmw_zenoh_cpp; '
-                      'exec python3 -u /home/firefly/rviz_navigation/posture_firefly.py ' + action)
-            command = ['ssh', '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
-                                     '-o', 'ServerAliveInterval=5', '-o', 'ServerAliveCountMax=2',
-                                     'firefly', 'bash', '-c', "'" + remote + "'"]
+            command = ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'voice_navigation', 'posture_firefly.py'), action], ros=True)
             if action == 'greet':
                 result = run_greeting(command, playback_command(False, ROOT/'audio', 'greet.wav'),
                                       lambda: generation == self.generation,
@@ -449,8 +444,7 @@ def main():
     if not args.local and not args.wav:
         # Reset robot reply volume on every live voice-control startup.
         try:
-            subprocess.run(['ssh', '-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=5',
-                            'aidlux', 'pactl', 'set-sink-volume', REMOTE_SINK, '40%'],
+            subprocess.run(ssh_command('aidlux', ['pactl', 'set-sink-volume', REMOTE_SINK, '40%'], timeout=5),
                            check=True, timeout=8)
             report(event='reply_volume', percent=40, device=REMOTE_SINK)
         except (OSError, subprocess.SubprocessError) as exc:

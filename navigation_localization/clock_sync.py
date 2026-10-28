@@ -1,4 +1,5 @@
 """Continuously estimate a remote wall clock against the local monotonic clock."""
+from project_config import remote_file, ssh_command
 import selectors,subprocess,threading,time
 
 class RemoteClock:
@@ -40,7 +41,7 @@ class ClockSync:
         while not self.closed.is_set():
             selector=None
             try:
-                self.proc=subprocess.Popen(['ssh','-T','-o','BatchMode=yes','-o','ConnectTimeout=5','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=2','aidlux','python3','-u','/home/aidlux/navigation_preview/clock_probe.py'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
+                self.proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'navigation_localization', 'clock_probe.py')], timeout=5),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
                 selector=selectors.DefaultSelector();selector.register(self.proc.stdout,selectors.EVENT_READ)
                 if self.line(selector,10)!='CLOCK_READY':raise ValueError('invalid clock probe hello')
                 while not self.closed.is_set():

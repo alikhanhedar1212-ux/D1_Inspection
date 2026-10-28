@@ -14,6 +14,9 @@
 import argparse
 import os
 import sys
+from pathlib import Path
+
+WORKSPACE = Path(__file__).resolve().parents[1]
 
 
 def parse_args():
@@ -23,13 +26,13 @@ def parse_args():
     parser.add_argument(
         "--data", "-d",
         type=str,
-        default="datasets/my_dataset/dataset.yaml",
+        default=str(WORKSPACE / "datasets/my_dataset/dataset.yaml"),
         help="数据集配置 yaml 路径，默认 datasets/my_dataset/dataset.yaml。",
     )
     parser.add_argument(
         "--model", "-m",
         type=str,
-        default="models/yolov8n.pt",
+        default=str(WORKSPACE / "models/yolov8n.pt"),
         help="初始权重路径，默认 models/yolov8n.pt（YOLOv8n COCO 预训练权重）。",
     )
     parser.add_argument(
@@ -66,7 +69,7 @@ def parse_args():
     parser.add_argument(
         "--project", "-p",
         type=str,
-        default="outputs",
+        default=str(WORKSPACE / "outputs"),
         help="训练输出根目录，默认 outputs。",
     )
     parser.add_argument(

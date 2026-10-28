@@ -1,4 +1,4 @@
-path: /home/ubuntu20/d1_ws/yolo/yolo/datasets/my_dataset
+# 数据集根目录按当前 YAML 所在目录解析。
 train: images/train
 val: images/val
 test: images/test

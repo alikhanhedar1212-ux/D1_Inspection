@@ -49,7 +49,7 @@ class VoiceRelocalizerTests(unittest.TestCase):
             worker._execute(threading.Event())
             result = next(e for e in events if e['event'] == 'localization_result')
             self.assertEqual(result['reply'], '已定位' if success else '请重新定位')
-            self.assertTrue(calls[-1][-1].endswith('localization_success.wav' if success else 'localization_failure.wav'))
+            self.assertIn('localization_success.wav' if success else 'localization_failure.wav', calls[-1][-1])
             self.assertFalse(worker.busy)
 
     def test_cancel_never_announces_success_or_replays_job(self):

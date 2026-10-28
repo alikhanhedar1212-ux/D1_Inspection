@@ -1,3 +1,4 @@
+from project_config import remote_file, ssh_command
 from pathlib import Path
 import time,zlib,json,subprocess,threading
 import numpy as np,rclpy
@@ -17,7 +18,6 @@ tfpub=n.create_publisher(TFMessage,'/tf',100)
 staticpub=n.create_publisher(TFMessage,'/tf_static',QoSProfile(depth=1,reliability=ReliabilityPolicy.RELIABLE,durability=DurabilityPolicy.TRANSIENT_LOCAL))
 tf=TransformStamped();tf.header.frame_id='nav_base';tf.child_frame_id='nav_scan';tf.transform.rotation.w=1.;staticpub.publish(TFMessage(transforms=[tf]))
 root=Path(__file__).parent
-cmd='source /opt/ros/humble/setup.bash; export ROS_DOMAIN_ID=0 RMW_IMPLEMENTATION=rmw_fastrtps_cpp; exec python3 -u /home/aidlux/navigation_preview/stream_sender.py'
 clock=RemoteClock();clock_sync=ClockSync(clock)
 mailbox=LatestFrames();counts={};published={};dropped={};status={'connection':'connecting'};closed=threading.Event();proc=None
 
@@ -25,7 +25,7 @@ def receive():
     global proc
     while not closed.is_set():
         try:
-            proc=subprocess.Popen(['ssh','-T','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=2','aidlux','bash','-c',"'"+cmd+"'"],stdout=subprocess.PIPE)
+            proc=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', 'navigation_localization', 'stream_sender.py')], ros=True, timeout=10),stdout=subprocess.PIPE)
             remote_clock=read_hello(proc.stdout)
             # Bootstrap from sender wall time; independent pings recalibrate every 10s.
             local_clock=time.time();local_mono=time.monotonic();clock.prime(remote_clock,local_mono)

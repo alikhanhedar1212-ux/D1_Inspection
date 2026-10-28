@@ -31,3 +31,6 @@ weights/
 *.npy
 vendor/
 .ssh/
+
+config.local.json
+navigation_localization/lio.yaml

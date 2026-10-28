@@ -1,6 +1,8 @@
 import ctypes as c
-from PIL import ImageGrab
-X=c.CDLL('libX11.so.6');X.XOpenDisplay.argtypes=[c.c_char_p];X.XOpenDisplay.restype=c.c_void_p;d=X.XOpenDisplay(b':1');X.XDefaultRootWindow.argtypes=[c.c_void_p];X.XDefaultRootWindow.restype=c.c_ulong;root=X.XDefaultRootWindow(d)
+import os
+X=c.CDLL('libX11.so.6');X.XOpenDisplay.argtypes=[c.c_char_p];X.XOpenDisplay.restype=c.c_void_p;d=X.XOpenDisplay(os.environ.get('DISPLAY', '').encode());
+if not d:raise SystemExit('Cannot open DISPLAY; run inside a graphical desktop session')
+X.XDefaultRootWindow.argtypes=[c.c_void_p];X.XDefaultRootWindow.restype=c.c_ulong;root=X.XDefaultRootWindow(d)
 X.XQueryTree.argtypes=[c.c_void_p,c.c_ulong,c.POINTER(c.c_ulong),c.POINTER(c.c_ulong),c.POINTER(c.POINTER(c.c_ulong)),c.POINTER(c.c_uint)];X.XFetchName.argtypes=[c.c_void_p,c.c_ulong,c.POINTER(c.c_void_p)];X.XFree.argtypes=[c.c_void_p];X.XInternAtom.argtypes=[c.c_void_p,c.c_char_p,c.c_int];X.XInternAtom.restype=c.c_ulong
 rp=c.c_ulong();pp=c.c_ulong();children=c.POINTER(c.c_ulong)();count=c.c_uint();X.XQueryTree(d,root,c.byref(rp),c.byref(pp),c.byref(children),c.byref(count));target=None
 windows=list(children[:count.value])

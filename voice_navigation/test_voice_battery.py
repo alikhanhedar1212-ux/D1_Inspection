@@ -60,8 +60,8 @@ class BatteryTests(unittest.TestCase):
                 worker._execute(threading.Event())
                 result = next(e for e in events if e['event']=='battery_result')
                 self.assertEqual(result['success'], ok)
-                self.assertEqual(calls[0][-1], '/home/firefly/rviz_navigation/read_battery_native')
-                self.assertEqual(calls[1][-1], '56' if ok else 'unavailable')
+                self.assertIn('D1_Inspection/voice_navigation/read_battery_native', calls[0][-1])
+                self.assertTrue(calls[1][-1].endswith(('56' if ok else 'unavailable') + "'"))
                 self.assertFalse(any('cmd_vel' in arg or 'posture' in arg for cmd in calls for arg in cmd))
                 self.assertFalse(worker.busy)
 

@@ -1,3 +1,4 @@
+from project_config import remote_file, ssh_command
 import time,json,subprocess,math,threading
 from pathlib import Path
 import numpy as np
@@ -38,8 +39,7 @@ class Bridge(Node):
   if stationary and not self.confident and not pending and self.refresh.service_is_ready():
    self.refresh_future=self.refresh.call_async(Empty.Request())
  def connect(self):
-  command='source /opt/ros/humble/setup.bash; source /opt/robot/robot-forward/install/setup.bash; export ROS_DOMAIN_ID=24 RMW_IMPLEMENTATION=rmw_zenoh_cpp; exec python3 -u /home/firefly/rviz_navigation/velocity_receiver.py'
-  self.proc=subprocess.Popen(['ssh','-T','-o','BatchMode=yes','-o','ConnectTimeout=8','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=2','firefly','bash','-c',"'"+command+"'"],stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
+  self.proc=subprocess.Popen(ssh_command('firefly', ['python3', '-u', remote_file('firefly', 'navigation_localization', 'velocity_receiver.py')], ros=True),stdin=subprocess.PIPE,stdout=subprocess.PIPE,text=True,bufsize=1)
   self.transport_lost=False
   threading.Thread(target=self.feedback,args=(self.proc,),daemon=True).start()
  def feedback(self,proc):

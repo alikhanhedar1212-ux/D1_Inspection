@@ -1,4 +1,5 @@
 """Run on AidLux: its installed eSpeak-NG library, existing USB speaker."""
+from project_config import setting
 import argparse
 import ctypes as C
 import json
@@ -10,7 +11,7 @@ import wave
 from play_reply import play
 
 PHRASES = {'device_normal': '设备正常', 'device_missing': '设备丢失', 'camera_error': '摄像头异常', 'planning_error': '路径规划异常', 'sign_error': '路标识别异常', 'map_3d_ready': '已切换到三维地图，起始位置和朝向已确认。', 'request_open_door': '请帮我开门', 'confirm_door_open': '是否同意我通过这扇门？请确认门已打开且通道安全，同意请说确认。', 'permit_door_1_enter': '我准备从1号门进入，是否同意通行？请确认门已打开且通道安全，同意请说确认。', 'permit_door_1_exit': '我准备从1号门出去，是否同意通行？请确认门已打开且通道安全，同意请说确认。', 'permit_door_2_enter': '我准备从2号门进入，是否同意通行？请确认门已打开且通道安全，同意请说确认。', 'permit_door_2_exit': '我准备从2号门出去，是否同意通行？请确认门已打开且通道安全，同意请说确认。'}
-SINK = 'alsa_output.usb-Generic_USB2.0_Device_20170726905923-01.analog-stereo'
+SINK = setting('speaker')
 PHRASES.update(localization_success='已定位', localization_failure='请重新定位')
 ROOT = Path(__file__).parent
 

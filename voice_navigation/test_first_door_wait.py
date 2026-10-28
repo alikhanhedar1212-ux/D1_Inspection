@@ -48,7 +48,9 @@ class FirstDoorWaitTests(unittest.TestCase):
         calls = []
         r._check_2d = lambda: calls.append('2d')
         r._service = lambda *args: self.fail('must not call 3D service')
-        r._preflight(None)
+        from unittest.mock import patch
+        with patch('stairs_runtime.Path.is_file', return_value=True):
+            r._preflight(None)
         self.assertEqual(calls, ['2d'])
         self.assertFalse(r.in_3d)
 

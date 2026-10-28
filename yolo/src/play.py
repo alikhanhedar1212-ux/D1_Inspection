@@ -17,6 +17,9 @@ import argparse
 import glob
 import os
 import sys
+from pathlib import Path
+
+WORKSPACE = Path(__file__).resolve().parents[1]
 
 WINDOW_TITLE = "YOLO on Go2"
 DEFAULT_MODEL = os.path.join("outputs", "train_noflip", "weights", "best.pt")
@@ -29,9 +32,9 @@ def parse_args():
     parser.add_argument(
         "--source", "-s",
         type=str,
-        default="rtsp://192.168.3.100:8554/test?tcp",
+        default=os.environ.get("D1_CAMERA_URL"),
         help="视频来源：RTSP 地址或本地视频文件路径，"
-             "默认 rtsp://192.168.3.100:8554/test?tcp。",
+             "也可设置环境变量 D1_CAMERA_URL。",
     )
     parser.add_argument(
         "--model", "-m",
@@ -47,7 +50,10 @@ def parse_args():
         default=0.5,
         help="置信度阈值，默认 0.5。",
     )
-    return parser.parse_args()
+    args = parser.parse_args()
+    if not args.source:
+        parser.error("请用 --source 指定视频地址，或设置 D1_CAMERA_URL")
+    return args
 
 
 def resolve_model_path(arg):
@@ -64,18 +70,19 @@ def resolve_model_path(arg):
             os.path.join("outputs", arg, "weights", "best.pt"),
         ]
         for c in candidates:
-            p = os.path.abspath(c)
-            if os.path.isfile(p):
-                return p
+            for base in (Path.cwd(), WORKSPACE):
+                p = str((base / c).resolve())
+                if os.path.isfile(p):
+                    return p
         sys.exit(f"错误：找不到模型权重：{arg}\n"
                  f"可传 best.pt 路径、实验目录或实验名（如 train_exp-3）。")
 
-    default_p = os.path.abspath(DEFAULT_MODEL)
+    default_p = str(WORKSPACE / DEFAULT_MODEL)
     if os.path.isfile(default_p):
         return default_p
 
     bests = [os.path.abspath(p) for p in
-             glob.glob(os.path.join("outputs", "*", "weights", "best.pt"))]
+             glob.glob(str(WORKSPACE / "outputs/*/weights/best.pt"))]
     if bests:
         newest = max(bests, key=os.path.getmtime)
         print(f"提示：默认权重 {DEFAULT_MODEL} 不存在，已自动改用最新的实验：{newest}")

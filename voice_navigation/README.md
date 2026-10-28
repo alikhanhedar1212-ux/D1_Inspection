@@ -1,9 +1,11 @@
+> 可迁移部署以仓库根目录 README.md 为准。下文包含功能开发历史记录；命令按仓库根目录执行。本机路径按脚本位置自动解析，远端默认 ~/D1_Inspection，可在 config.local.json 修改。
+
 # USB 麦克风语音导航
 
 链路：AidLux USB 麦克风 → PulseAudio 16 kHz 单声道录音 → SSH → 本机离线 Vosk 中文识别 → Nav2 NavigateToPose → 现有 velocity_bridge → Firefly。
 
-本机目录：`/home/hcb/aidlux_mapping_view/voice_navigation`。
-远端录音脚本：`/home/aidlux/voice_navigation/audio_sender.py`。
+本机目录：`./voice_navigation`。
+远端录音脚本：`~/D1_Inspection/voice_navigation/audio_sender.py`。
 模型来自 https://alphacephei.com/vosk/models ，使用 `vosk-model-small-cn-0.22`。
 音频不提交给云端。识别结果写到本机 `status.json`，终端也会输出。
 
@@ -13,7 +15,7 @@
 
 启动页面服务（监听程序需单独启动）：
 ```bash
-python3 /home/hcb/aidlux_mapping_view/voice_navigation/voice_dashboard.py
+python3 ./voice_navigation/voice_dashboard.py
 ```
 页面默认监听所有 IPv4 网卡，同一局域网内可通过 `http://电脑局域网IP:8091/` 访问；本机仍可使用上述地址。若需仅限本机，启动时加 `--host 127.0.0.1`。识别事件保存在本地 `ui_events.jsonl`，无外部字体、脚本或网络依赖。“清空显示”只清空当前页面记录，不删除文件。
 
@@ -22,7 +24,7 @@ python3 /home/hcb/aidlux_mapping_view/voice_navigation/voice_dashboard.py
 ### 在本机测试，不连接机器狗
 
 ```bash
-bash /home/hcb/aidlux_mapping_view/voice_navigation/run_local.sh
+bash ./voice_navigation/run_local.sh
 ```
 
 使用电脑当前默认麦克风和扬声器，无需 ROS 或 SSH。说“太乙真人”，电脑播放“我在”；回复后 10 秒内说“去一号位置”或其它已有指令，电脑播放“好的”，终端打印解析结果，不触发移动。超时需要重新唤醒，按 Ctrl+C 退出。
@@ -40,7 +42,7 @@ Newmine 当前使用 `newmine_noise_profile.npz` 做实时背景噪声抑制，�
 ### 电脑收音，机器狗播报
 
 ```bash
-bash /home/hcb/aidlux_mapping_view/voice_navigation/run_computer_mic.sh
+bash ./voice_navigation/run_computer_mic.sh
 ```
 
 电脑接入 Newmine ZM12 并将其设为默认输入，或用 `--source` 指定设备。电脑离线识别“太乙真人”后，通过 SSH 调用 aidlux 播放“我在”；10 秒内收到有效指令，在机器狗播放“好的”。默认仍只演示识别和回复，不触发移动。本机噪声配置复用 `newmine_noise_profile.npz`。实际导航可使用同模式加 `--execute`，仍需先确认地图点位及现有导航系统状态。
@@ -48,7 +50,7 @@ bash /home/hcb/aidlux_mapping_view/voice_navigation/run_computer_mic.sh
 已确认输入为 Newmine（纽曼）ZM12 USB 麦克风，生产厂家为北京纽曼腾飞科技有限公司。
 
 ```bash
-bash /home/hcb/aidlux_mapping_view/voice_navigation/run.sh
+bash ./voice_navigation/run.sh
 ```
 
 默认只识别，不发送运动目标。先说“太乙真人”，机器狗回答“我在”。从回复播放完毕开始有 10 秒可以说一个完整指令，说完停顿一下：
@@ -75,7 +77,7 @@ bash /home/hcb/aidlux_mapping_view/voice_navigation/run.sh
 点位配置复用 `../navigation_localization/waypoints.yaml`。其中位置目前标记 `confirmed: false`，需逐个在现场核对坐标和朝向后改为 `true`；未确认点位会拒绝运动。
 
 ```bash
-bash /home/hcb/aidlux_mapping_view/voice_navigation/run.sh --execute
+bash ./voice_navigation/run.sh --execute
 ```
 
 识别最终结果且词置信度至少 0.65 才执行。每次只接收一个目的地，正在执行本程序目标时，先说停止再更换目的地。沿用现有导航避障、限速和定位质量保护。首次启动不恢复旧语音目标，音频断线丢弃未完成识别结果，重连后需重新说指令。退出本程序时取消本程序仍在执行的目标。
@@ -83,7 +85,7 @@ bash /home/hcb/aidlux_mapping_view/voice_navigation/run.sh --execute
 ## 验证与状态
 
 ```bash
-cd /home/hcb/aidlux_mapping_view/voice_navigation
+cd ./voice_navigation
 python3 -m unittest -v test_commands
 bash run.sh --text '去洗手间门口'
 ```
@@ -139,7 +141,7 @@ run.sh 已改为复用 navigation_localization/runtime_env.sh 的 Cyclone DDS �
 
 唤醒“小爱小爱”，听到“我在”后说“还剩多少电”“还有多少电”“查询电量”或“电池电量”。每次在Firefly原生battery_state通道读取至少两帧新数据，校验来源、时间、百分比范围和有效电压，再经AidLux本地语音引擎播报“当前电量百分之……”。不使用历史缓存替代失败结果；数据不可用时播报“暂时无法读取电量，请稍后再试”。
 
-只读查询不取消正在执行的导航，不修改姿态、电量或充电控制；“停止”可取消查询。播报期间抑制自身回声并保留停止识别。读取程序/home/firefly/rviz_navigation/read_battery_native，播报/home/aidlux/voice_navigation/battery_reply.py，状态battery_status.json。沿用40%音量，按百分比缓存语音。原始电流为uint32回绕值、厂商error位含义尚未解析，本功能不据此判断充电状态或电池健康，仅播报power百分比。
+只读查询不取消正在执行的导航，不修改姿态、电量或充电控制；“停止”可取消查询。播报期间抑制自身回声并保留停止识别。读取程序~/D1_Inspection/voice_navigation/read_battery_native，播报~/D1_Inspection/voice_navigation/battery_reply.py，状态battery_status.json。沿用40%音量，按百分比缓存语音。原始电流为uint32回绕值、厂商error位含义尚未解析，本功能不据此判断充电状态或电池健康，仅播报power百分比。
 
 
 2026-10-23 电量播报开头改用用户下载/当前电量.wav，完整0.96秒当前电量为，后接百分之及实时数字。battery_audio.py保持开头PCM样本不变，将数字重采样到48kHz并加入100ms间隔；缓存键包含两组件哈希，旧整句缓存不再误用。当前数字仍由既有espeak-ng合成，未实现参考音色克隆；整句同音色需求尚待额外数字录音或参考音色引擎。此限制不得描述为已完成同音色数字。

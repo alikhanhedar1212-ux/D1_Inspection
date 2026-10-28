@@ -1,4 +1,5 @@
 """Receive source-timestamped latest camera frames; shared by RViz and OctoMap."""
+from deployment import remote_file, ssh_command
 import subprocess,cv2,numpy as np,time,rclpy,json,threading
 from pathlib import Path
 from cv_bridge import CvBridge
@@ -15,7 +16,7 @@ def receiver():
     global p
     while not closed.is_set():
         try:
-            p=subprocess.Popen(['ssh','-T','-o','BatchMode=yes','-o','ConnectTimeout=10','-o','ServerAliveInterval=5','-o','ServerAliveCountMax=2','aidlux','python3','-u','/home/aidlux/mapping_test/camera_sender_latest.py'],stdout=subprocess.PIPE)
+            p=subprocess.Popen(ssh_command('aidlux', ['python3', '-u', remote_file('aidlux', '', 'camera_sender_latest.py')], timeout=5),stdout=subprocess.PIPE)
             remote_clock=read_hello(p.stdout);mono=time.monotonic();clock.prime(remote_clock,mono);status.update(connection='streaming',clock_translation_s=time.time()-remote_clock)
             while not closed.is_set():
                 captured,sent,sequence,payload=read_frame(p.stdout)

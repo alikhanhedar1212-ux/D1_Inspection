@@ -111,9 +111,9 @@
       ]
     },
     "unknown_preserved": true,
-    "report": "/home/hcb/aidlux_mapping_view/navigation_localization/washroom_restore_report.json"
+    "report": "navigation_localization/washroom_restore_report.json"
   },
-  "backup": "/home/hcb/aidlux_mapping_view/navigation_localization/backups/patrol_20261026_135844",
+  "backup": "navigation_localization/backups/patrol_20261026_135844",
   "vision": {
     "backend": "external",
     "module": null,

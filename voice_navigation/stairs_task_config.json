@@ -76,7 +76,7 @@
   "requires_measured_door_1_clearance": true,
   "note": "当前仅导航至已确认1号点附近，停稳并请求开门后持续等待；确认不触发运动，不穿门、不下楼。未启用门框自动识别或居中。",
   "speech_backend": "aidlux_native_cached_wav",
-  "speech_remote_script": "/home/aidlux/voice_navigation/aidlux_native_speech.py",
+  "speech_remote_script": "voice_navigation/aidlux_native_speech.py",
   "body_frame_3d": "stairs_body",
   "door_passage_policy": {
     "both_directions": true,
