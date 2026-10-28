@@ -85,6 +85,17 @@ python src/play.py --conf 0.5                     # 调整置信度阈值
 
 需要图形界面（`cv2.imshow`），按 `q` 退出；流中断会自动重连。
 
+## 6. 网页直播（src/yolo_web.py）
+
+把 YOLO 检测画面输出到浏览器，局域网内任何设备都能看，无需图形界面：
+
+```bash
+python src/yolo_web.py                      # 默认 RTSP + 默认权重，端口 8092
+python src/yolo_web.py --source video/sample.mp4 --port 9000
+```
+
+浏览器打开 `http://<本机IP>:8092/` 即可观看（手机连同一局域网也行）。推理只跑一份，多个浏览器同时看不增加负担。嵌入巡检仪表盘（`UI/voice_dashboard.py`）只需加一行 `<img src="http://<本机IP>:8092/video">` 或 iframe。
+
 ## 附：旧脚本 src/d1_yolo.py
 
 COCO 预训练模型的 person 检测演示，模型路径是相对路径，**必须从 models/ 目录启动**，否则会联网重新下载权重：
